@@ -1,0 +1,19 @@
+# Local development database. Run the API itself with `npm run start:dev`.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: neowell
+      POSTGRES_PASSWORD: neowell
+      POSTGRES_DB: neowell
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U neowell']
+      interval: 5s
+      retries: 10
+
+volumes:
+  pgdata:

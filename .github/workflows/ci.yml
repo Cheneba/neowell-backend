@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: neowell
+          POSTGRES_PASSWORD: neowell
+          POSTGRES_DB: neowell_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U neowell"
+          --health-interval 5s
+          --health-retries 10
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://neowell:neowell@localhost:5432/neowell_test
+      JWT_ACCESS_SECRET: ci-access-secret-0123456789abcdef0123456789
+      OTP_SECRET: ci-otp-secret-0123456789abcdef0123456789abcd
+      STORAGE_LOCAL_DIR: /tmp/neowell-uploads
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm test
+      - run: npx prisma migrate deploy
+      - run: npm run test:e2e

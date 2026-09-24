@@ -1,0 +1,428 @@
+// NeoWell data model — see README.md for the architecture overview.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ───────────────────────────── Identity & access ─────────────────────────────
+
+enum Role {
+  CAREGIVER
+  CLINICIAN
+  ADMIN
+}
+
+enum Locale {
+  en
+  fr
+}
+
+model User {
+  id       String  @id @default(uuid())
+  phone    String  @unique // E.164, e.g. +2376XXXXXXXX
+  email    String? @unique
+  fullName String?
+  role     Role    @default(CAREGIVER)
+  locale   Locale  @default(en)
+  isActive Boolean @default(true)
+
+  // Explicit consent timestamps (null = not given). See PDR §9.
+  consentDataCollectionAt DateTime?
+  consentClinicianShareAt DateTime?
+  consentRecordingAt      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  babies        Baby[]
+  clinician     ClinicianProfile?
+  refreshTokens RefreshToken[]
+  consultations Consultation[]    @relation("CaregiverConsultations")
+  auditLogs     AuditLog[]
+}
+
+model OtpCode {
+  id         String    @id @default(uuid())
+  phone      String
+  codeHash   String
+  expiresAt  DateTime
+  attempts   Int       @default(0)
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([phone, createdAt])
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ───────────────────────────── Babies & daily checks ─────────────────────────
+
+enum Sex {
+  FEMALE
+  MALE
+  UNKNOWN
+}
+
+model Baby {
+  id                  String    @id @default(uuid())
+  caregiverId         String
+  name                String
+  sex                 Sex       @default(UNKNOWN)
+  dateOfBirth         DateTime
+  birthWeightGrams    Int?
+  gestationalAgeWeeks Int?
+  birthHospital       String?
+  dischargeDate       DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  deletedAt           DateTime?
+
+  caregiver     User           @relation(fields: [caregiverId], references: [id], onDelete: Cascade)
+  observations  Observation[]
+  consultations Consultation[]
+  drugCharts    DrugChart[]
+
+  @@index([caregiverId])
+}
+
+enum RiskLevel {
+  GREEN
+  YELLOW
+  RED
+}
+
+enum SkinColor {
+  NORMAL
+  PALE
+  YELLOW
+  BLUE
+  MOTTLED
+}
+
+enum FeedingQuality {
+  GOOD
+  REDUCED
+  UNABLE
+}
+
+enum StoolPattern {
+  NORMAL
+  REDUCED
+  NONE
+  DIARRHEA
+  BLOODY
+}
+
+enum CryDescription {
+  NORMAL
+  WEAK
+  HIGH_PITCHED
+  INCONSOLABLE
+}
+
+enum ActivityLevel {
+  NORMAL
+  REDUCED
+  LETHARGIC
+}
+
+enum BreathingStatus {
+  NORMAL
+  FAST
+  DIFFICULT
+}
+
+enum JaundiceLevel {
+  NONE
+  FACE_CHEST
+  PALMS_SOLES
+}
+
+enum CordStatus {
+  NORMAL
+  RED_OR_DISCHARGE
+  SPREADING_REDNESS_OR_PUS
+}
+
+enum TemperatureSource {
+  MANUAL
+  BLE_THERMOMETER
+  VOICE
+}
+
+model Observation {
+  id              String            @id @default(uuid())
+  babyId          String
+  recordedById    String
+  observedAt      DateTime          @default(now())
+  temperatureC    Decimal?          @db.Decimal(4, 1)
+  temperatureSrc  TemperatureSource @default(MANUAL)
+  feedingCount24h Int?
+  feedingQuality  FeedingQuality?
+  stoolPattern    StoolPattern?
+  skinColor       SkinColor?
+  cry             CryDescription?
+  activity        ActivityLevel?
+  breathing       BreathingStatus?
+  jaundice        JaundiceLevel?
+  cordStatus      CordStatus?
+  convulsions     Boolean           @default(false)
+  notes           String?
+  photoKey        String?
+
+  // Output of the risk engine, stored for clinical continuity/audit.
+  riskLevel     RiskLevel
+  riskReasons   Json
+  riskEngineVer String
+  createdAt     DateTime  @default(now())
+
+  baby Baby @relation(fields: [babyId], references: [id], onDelete: Cascade)
+
+  @@index([babyId, observedAt])
+}
+
+// ───────────────────────────── Facilities & referral ─────────────────────────
+
+enum FacilityService {
+  NEONATOLOGY
+  PAEDIATRICS
+  OPD
+  MATERNITY
+  EMERGENCY
+}
+
+model Facility {
+  id        String            @id @default(uuid())
+  name      String
+  region    String?
+  city      String?
+  address   String?
+  latitude  Float
+  longitude Float
+  services  FacilityService[]
+  mainPhone String?
+  hours     String?
+  isActive  Boolean           @default(true)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  departments FacilityDepartment[]
+
+  @@index([latitude, longitude])
+}
+
+model FacilityDepartment {
+  id         String          @id @default(uuid())
+  facilityId String
+  service    FacilityService
+  name       String
+  phone      String
+
+  facility Facility @relation(fields: [facilityId], references: [id], onDelete: Cascade)
+
+  @@unique([facilityId, service])
+}
+
+// ───────────────────────────── Clinicians ────────────────────────────────────
+
+enum VerificationStatus {
+  PENDING_DOCUMENTS
+  PENDING_REVIEW
+  VERIFIED
+  REJECTED
+  SUSPENDED
+}
+
+enum ClinicianDocumentType {
+  MEDICAL_LICENSE
+  MEDICAL_DEGREE
+  EMPLOYMENT_PROOF
+}
+
+model ClinicianProfile {
+  id                 String             @id @default(uuid())
+  userId             String             @unique
+  licenseNumber      String             @unique
+  specialties        String[]
+  bio                String?
+  currentFacility    String?
+  consultationFeeXaf Int
+  verificationStatus VerificationStatus @default(PENDING_DOCUMENTS)
+  verificationNote   String?
+  verifiedAt         DateTime?
+  verifiedById       String?
+  ratingAvg          Decimal?           @db.Decimal(3, 2)
+  ratingCount        Int                @default(0)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  user          User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents     ClinicianDocument[]
+  availability  ClinicianAvailability[]
+  consultations Consultation[]
+}
+
+model ClinicianDocument {
+  id           String                @id @default(uuid())
+  clinicianId  String
+  type         ClinicianDocumentType
+  storageKey   String
+  originalName String
+  mimeType     String
+  sizeBytes    Int
+  uploadedAt   DateTime              @default(now())
+
+  clinician ClinicianProfile @relation(fields: [clinicianId], references: [id], onDelete: Cascade)
+
+  @@index([clinicianId, type])
+}
+
+/// Weekly recurring availability window, in the clinician's local time (Africa/Douala).
+model ClinicianAvailability {
+  id          String @id @default(uuid())
+  clinicianId String
+  dayOfWeek   Int // 0 = Sunday … 6 = Saturday
+  startMinute Int // minutes from midnight
+  endMinute   Int
+
+  clinician ClinicianProfile @relation(fields: [clinicianId], references: [id], onDelete: Cascade)
+
+  @@index([clinicianId])
+}
+
+// ───────────────────────────── Teleconsultation & payments ───────────────────
+
+enum ConsultationType {
+  AUDIO
+  VIDEO
+  CHAT
+}
+
+enum ConsultationStatus {
+  REQUESTED
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum PaymentStatus {
+  UNPAID
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model Consultation {
+  id               String             @id @default(uuid())
+  babyId           String
+  caregiverId      String
+  clinicianId      String
+  type             ConsultationType
+  status           ConsultationStatus @default(REQUESTED)
+  scheduledAt      DateTime
+  reason           String?
+  feeXaf           Int
+  commissionXaf    Int
+  paymentStatus    PaymentStatus      @default(UNPAID)
+  previsitSummary  Json?
+  recordingConsent Boolean            @default(false)
+  recordingKey     String?
+  clinicianNotes   String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  baby      Baby             @relation(fields: [babyId], references: [id], onDelete: Cascade)
+  caregiver User             @relation("CaregiverConsultations", fields: [caregiverId], references: [id], onDelete: Cascade)
+  clinician ClinicianProfile @relation(fields: [clinicianId], references: [id])
+  payments  Payment[]
+  drugChart DrugChart?
+
+  @@index([clinicianId, scheduledAt])
+  @@index([caregiverId])
+}
+
+enum PaymentProvider {
+  MTN_MOMO
+  ORANGE_MONEY
+}
+
+model Payment {
+  id             String          @id @default(uuid())
+  consultationId String
+  provider       PaymentProvider
+  payerPhone     String
+  amountXaf      Int
+  status         PaymentStatus   @default(PENDING)
+  externalRef    String?         @unique
+  rawResponse    Json?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  consultation Consultation @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+}
+
+// ───────────────────────────── Drug chart ────────────────────────────────────
+
+model DrugChart {
+  id             String   @id @default(uuid())
+  babyId         String
+  consultationId String?  @unique
+  prescribedById String
+  startDate      DateTime
+  createdAt      DateTime @default(now())
+
+  baby         Baby            @relation(fields: [babyId], references: [id], onDelete: Cascade)
+  consultation Consultation?   @relation(fields: [consultationId], references: [id])
+  items        DrugChartItem[]
+}
+
+model DrugChartItem {
+  id           String   @id @default(uuid())
+  drugChartId  String
+  drugName     String
+  dose         String // e.g. "2.5 ml"
+  route        String // e.g. "oral"
+  timesOfDay   String[] // "HH:mm", local time
+  durationDays Int
+  instructions String?
+
+  drugChart DrugChart @relation(fields: [drugChartId], references: [id], onDelete: Cascade)
+}
+
+// ───────────────────────────── Audit ─────────────────────────────────────────
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  action     String // e.g. "POST /babies/:id/observations"
+  entityType String?
+  entityId   String?
+  statusCode Int?
+  ip         String?
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([entityType, entityId])
+}
