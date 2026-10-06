@@ -25,6 +25,7 @@ import { CreateBabyDto, UpdateBabyDto } from './dto/baby.dto';
 export class BabiesController {
   constructor(private readonly babies: BabiesService) {}
 
+  /** Add a baby; birth weight, length and HC are required (FR-BABY-01). */
   @Post()
   create(@CurrentUser() user: AuthUser, @Body() dto: CreateBabyDto) {
     return this.babies.create(user.id, dto);
@@ -55,7 +56,7 @@ export class BabiesController {
     return this.babies.remove(user.id, id);
   }
 
-  /** How many checks this baby needs per day (depends on age) and how many are still due. */
+  /** Checks per day for this age, checks still due, and any pending recheck (FR-CHK-01). */
   @Get(':id/check-schedule')
   checkSchedule(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string) {
     return this.babies.checkSchedule(user.id, id);

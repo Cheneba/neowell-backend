@@ -52,7 +52,7 @@ NeoWell has three kinds of background work. None of them needs any infrastructur
 | **J4** | `payments.reconcile` | every 5 min | Payments PENDING for more than 3 min → enqueue **Q5 payment status**. PENDING for more than 2 h → FAILED ("timed out"). | PAY-01 |
 | **J5** | `babies.namePrompt` | daily 08:00 | Babies reaching 42 days with no `givenName` and `namePromptSentAt` null → notify the caregiver (BABY_NAME_PROMPT), set `namePromptSentAt`. | BABY-02, NOT-01 |
 | **J6** | `checks.nudge` | every hour, 08:00–20:00 | Babies AT_HOME under 28 days whose last check is over 24 h old and who were not nudged in the last 24 h → notify (CHECK_NUDGE, push only). | NOT-05 |
-| **J7** | `payouts.weekly` | Mondays 06:00 (advisory lock) | For each clinician: COMPLETED + PAID consultations with no `payoutId` → one `Payout` (PENDING) for the previous week; link the consultations; notify the clinician. | CONS-14, ADM-03 |
+| **J7** | `payouts.weekly` | Mondays 06:00 (advisory lock) | For each clinician: COMPLETED or NO_SHOW consultations that are PAID and have no `payoutId` → one `Payout` (PENDING); link exactly those consultations; notify the clinician. | CONS-14, ADM-03 |
 | **J8** | `maintenance.cleanup` | daily 03:00 | Delete OTP codes older than 24 h; refresh tokens 30 days past expiry/revocation; DONE jobs older than 14 days; FAILED jobs older than 90 days; webhook events older than 90 days. Re-queue stuck RUNNING jobs. | §7 of doc 02 |
 | **J9** | `accounts.purge` | daily 03:30 (advisory lock) | Users with `deletionRequestedAt` 30+ days ago: delete babies (cascades to measurements, checks, voice notes), devices and notifications. Anonymise the user (`phone = deleted:<id>`, names removed). Consultations and messages are kept. Stored files are deleted via **Q7**. | ACC-04 |
 | **J10** | `push.receipts` | every 15 min | Fetch Expo push receipts for tickets from the last hour. Delete `Device` rows whose token returned `DeviceNotRegistered`. | ACC-05 |
@@ -64,7 +64,7 @@ NeoWell has three kinds of background work. None of them needs any infrastructur
 |---|---|---|---|---|---|---|
 | **Q1** | `notify` | Domain events (below), J1, J3, J5, J6, J7 | `{ userId, type, title, body, data?, sms?: boolean }` | Creates the `Notification` (inbox), then enqueues Q2 for each device. If `sms` is set and the user has no device, enqueues Q3. Text is chosen in the user's locale. | 5 | NOT-01, NOT-04 |
 | **Q2** | `push.send` | Q1 | `{ notificationId, token }` | POST to Expo Push API `https://exp.host/--/api/v2/push/send`. Stores the ticket id for J10. Sets `Notification.pushedAt`. | 5 | NOT-01 |
-| **Q3** | `sms.send` | Q1, OTP request | `{ phone, message, notificationId? }` | Sends through the SMS gateway (console driver in development). Sets `Notification.smsAt`. | 5 | AUTH-01, NOT-03 |
+| **Q3** | `sms.send` | Q1 (OTP codes are sent directly, without the queue, for speed) | `{ phone, message, notificationId? }` | Sends through the SMS gateway (console driver in development). Sets `Notification.smsAt`. | 5 | AUTH-01, NOT-03 |
 | **Q4** | `payment.refund` | decline, J2 expiry, cancellation | `{ consultationId }` | Creates a REFUND `Payment` and calls the provider's disbursement API. On success: `paymentStatus = REFUNDED`, notify the caregiver. Sandbox refunds succeed immediately. | 8 | PAY-02, CONS-04, CONS-10 |
 | **Q5** | `payment.status` | J4, `POST …/payments` (sandbox) | `{ paymentId }` | Asks the provider for the payment status and applies it exactly like a webhook (§5). The sandbox provider confirms after ~3 s: success unless the payer phone ends in `000`. | 5 | PAY-01, PAY-04 |
 | **Q6** | `voice.transcribe` | `POST /babies/:id/voice-notes` | `{ voiceNoteId }` | If `STT_URL` is set: POST the audio to the self-hosted OpenAI-compatible endpoint `{STT_URL}/v1/audio/transcriptions` (faster-whisper / Speaches), store transcript + language, detect complaint keywords (EN/FR) → TRANSCRIBED. If not set: SKIPPED. | 3 | VOICE-01..03 |
@@ -135,6 +135,7 @@ These run as **local notifications** on the phone, so they work offline (FR-NOT-
 | `JOBS_ENABLED` | `true` | Run cron + worker on this instance |
 | `JOBS_POLL_MS` | `2000` | Worker poll interval |
 | `PAYMENT_PROVIDER` | `SANDBOX` | Default provider adapter |
+| `PUSH_DRIVER` | `expo` | `expo` sends push notifications; `log` only logs them (tests) |
 | `PAYMENTS_WEBHOOK_SECRET` | — | HMAC secret for W1 |
 | `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET` | — | Calls (FR-CONS-09); calls are disabled when unset |
 | `STT_URL`, `STT_MODEL` | —, `Systran/faster-whisper-small` | Self-hosted speech-to-text (Q6) |

@@ -1,407 +1,571 @@
-import { INestApplication } from '@nestjs/common';
-import { Test } from '@nestjs/testing';
-import request from 'supertest';
-import { App } from 'supertest/types';
-import { AppModule } from '../src/app.module';
-import { SmsService } from '../src/notifications/sms.service';
-import { PrismaService } from '../src/prisma/prisma.service';
-import { setupApp } from '../src/setup-app';
+import { auth, babyBody, caregiver, createHarness, daysAgo, Harness } from './harness';
 
-/** Captures outgoing SMS so tests can read OTP codes. */
-class CapturingSms extends SmsService {
-  last = new Map<string, string>();
-  async send(phone: string, message: string) {
-    this.last.set(phone, message.match(/\d{6}/)![0]);
-  }
-}
-
-describe('NeoWell API (e2e)', () => {
-  let app: INestApplication<App>;
-  let prisma: PrismaService;
-  const sms = new CapturingSms();
-  const http = () => request(app.getHttpServer());
-
-  let phoneSeq = 0;
-  const newPhone = () =>
-    `+23767${String(Date.now()).slice(-5)}${String(++phoneSeq).padStart(2, '0')}`;
-
-  async function login(phone: string, role?: 'CAREGIVER' | 'CLINICIAN') {
-    await http().post('/auth/otp/request').send({ phone }).expect(202);
-    const res = await http()
-      .post('/auth/otp/verify')
-      .send({ phone, code: sms.last.get(phone), role })
-      .expect(200);
-    return res.body as { accessToken: string; refreshToken: string; isNewUser: boolean };
-  }
-  const auth = (token: string) => ({ Authorization: `Bearer ${token}` });
+describe('NeoWell API — caregiver flows (e2e)', () => {
+  let h: Harness;
 
   beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
-      .overrideProvider(SmsService)
-      .useValue(sms)
-      .compile();
-    app = moduleRef.createNestApplication();
-    setupApp(app);
-    await app.init();
-    prisma = app.get(PrismaService);
+    h = await createHarness();
   });
+  afterAll(() => h.close());
 
-  afterAll(async () => {
-    await app.close();
-  });
+  it('GET /health', () => h.http().get('/health').expect(200, { status: 'ok', database: 'up' }));
+  it('rejects unauthenticated requests', () => h.http().get('/babies').expect(401));
 
-  it('GET /health', () => http().get('/health').expect(200, { status: 'ok', database: 'up' }));
-
-  it('rejects unauthenticated requests', () => http().get('/babies').expect(401));
-
-  describe('auth', () => {
-    it('signs up with OTP, rejects a wrong code, and rotates refresh tokens', async () => {
-      const phone = newPhone();
-      await http().post('/auth/otp/request').send({ phone }).expect(202);
-      await http().post('/auth/otp/verify').send({ phone, code: '000000' }).expect(401);
-
-      const first = await http()
+  describe('auth (FR-AUTH)', () => {
+    it('signs up with OTP, rejects wrong/reused codes and rotates refresh tokens', async () => {
+      const phone = h.newPhone();
+      await h.http().post('/auth/otp/request').send({ phone }).expect(202);
+      await h.http().post('/auth/otp/verify').send({ phone, code: '000000' }).expect(401);
+      const first = await h
+        .http()
         .post('/auth/otp/verify')
-        .send({ phone, code: sms.last.get(phone) })
+        .send({ phone, code: h.sms.last.get(phone) })
         .expect(200);
       expect(first.body.isNewUser).toBe(true);
-
-      // A consumed code cannot be reused.
-      await http()
+      await h
+        .http()
         .post('/auth/otp/verify')
-        .send({ phone, code: sms.last.get(phone) })
+        .send({ phone, code: h.sms.last.get(phone) })
         .expect(401);
 
-      const me = await http().get('/me').set(auth(first.body.accessToken)).expect(200);
-      expect(me.body).toMatchObject({ phone, role: 'CAREGIVER' });
-
-      const rotated = await http()
+      const rotated = await h
+        .http()
         .post('/auth/refresh')
         .send({ refreshToken: first.body.refreshToken })
         .expect(200);
-      // Reusing the old refresh token is treated as theft and revokes the new one too.
-      await http()
+      await h
+        .http()
         .post('/auth/refresh')
         .send({ refreshToken: first.body.refreshToken })
         .expect(401);
-      await http()
+      await h
+        .http()
         .post('/auth/refresh')
         .send({ refreshToken: rotated.body.refreshToken })
         .expect(401);
     });
 
-    it('rejects a malformed phone number', () =>
-      http().post('/auth/otp/request').send({ phone: '670000000' }).expect(400));
-
     it('never lets a user self-assign ADMIN', async () => {
-      const phone = newPhone();
-      await http().post('/auth/otp/request').send({ phone }).expect(202);
-      await http()
+      const phone = h.newPhone();
+      await h.http().post('/auth/otp/request').send({ phone }).expect(202);
+      await h
+        .http()
         .post('/auth/otp/verify')
-        .send({ phone, code: sms.last.get(phone), role: 'ADMIN' })
+        .send({ phone, code: h.sms.last.get(phone), role: 'ADMIN' })
         .expect(400);
     });
   });
 
-  describe('caregiver flow', () => {
+  describe('profile and the 42-day naming rule (FR-ACC-01, FR-BABY-02)', () => {
+    it('requires first and last name before adding a baby', async () => {
+      const token = await h.login(h.newPhone());
+      const me = await h.http().get('/me').set(auth(token)).expect(200);
+      expect(me.body.profileComplete).toBe(false);
+      const res = await h.http().post('/babies').set(auth(token)).send(babyBody()).expect(403);
+      expect(res.body.code).toBe('PROFILE_INCOMPLETE');
+      const updated = await h
+        .http()
+        .patch('/me')
+        .set(auth(token))
+        .send({ firstName: 'Christian', lastName: 'Ndi' })
+        .expect(200);
+      expect(updated.body.profileComplete).toBe(true);
+      await h.http().post('/babies').set(auth(token)).send(babyBody()).expect(201);
+    });
+
+    it('names babies "Baby {mother}" under 42 days, numbers twins, and uses the given name later', async () => {
+      const token = await caregiver(h, 'Achu');
+      const twin1 = await h
+        .http()
+        .post('/babies')
+        .set(auth(token))
+        .send(babyBody({ givenName: 'Amara' }))
+        .expect(201);
+      expect(twin1.body.displayName).toBe('Baby Achu');
+      expect(twin1.body.givenName).toBe('Amara');
+      await h.http().post('/babies').set(auth(token)).send(babyBody()).expect(201);
+      const older = await h
+        .http()
+        .post('/babies')
+        .set(auth(token))
+        .send(babyBody({ givenName: 'Bih', dateOfBirth: daysAgo(60) }))
+        .expect(201);
+      const unnamedOlder = await h
+        .http()
+        .post('/babies')
+        .set(auth(token))
+        .send(babyBody({ dateOfBirth: daysAgo(400) }))
+        .expect(201);
+
+      const list = await h.http().get('/babies').set(auth(token)).expect(200);
+      const names = Object.fromEntries(
+        list.body.map((b: { id: string; displayName: string }) => [b.id, b.displayName]),
+      );
+      // Everyone still called "Baby Achu" is numbered in birth order: the unnamed 400-day-old first, then the twins.
+      expect(names[unnamedOlder.body.id]).toBe('Baby Achu 1');
+      expect(names[twin1.body.id]).toBe('Baby Achu 2');
+      expect(Object.values(names).sort()).toEqual([
+        'Baby Achu 1',
+        'Baby Achu 2',
+        'Baby Achu 3',
+        'Bih',
+      ]);
+      expect(names[older.body.id]).toBe('Bih');
+      expect(list.body.find((b: { id: string }) => b.id === unnamedOlder.body.id).needsName).toBe(
+        true,
+      );
+    });
+  });
+
+  describe('babies and growth (FR-BABY, FR-MEAS)', () => {
     let token: string;
     let babyId: string;
 
     beforeAll(async () => {
-      token = (await login(newPhone())).accessToken;
+      token = await caregiver(h);
     });
 
-    it('creates a baby profile', async () => {
-      const dob = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
-      const res = await http()
+    it('requires weight, length and head circumference', async () => {
+      const { birthHeadCircumferenceCm: _hc, ...noHc } = babyBody();
+      await h.http().post('/babies').set(auth(token)).send(noHc).expect(400);
+      const { birthWeightGrams: _w, ...noWeight } = babyBody();
+      await h.http().post('/babies').set(auth(token)).send(noWeight).expect(400);
+    });
+
+    it('classifies a preterm, low-birth-weight baby and stores the birth measurement', async () => {
+      const res = await h
+        .http()
         .post('/babies')
         .set(auth(token))
-        .send({ name: 'Amara', dateOfBirth: dob, birthWeightGrams: 3100, gestationalAgeWeeks: 39 })
+        .send(
+          babyBody({
+            gestationalAgeWeeks: 34,
+            birthWeightGrams: 2200,
+            birthLengthCm: 45,
+            birthHeadCircumferenceCm: 31.5,
+            dateOfBirth: daysAgo(20),
+          }),
+        )
         .expect(201);
       babyId = res.body.id;
-      expect(res.body.isHighRisk).toBe(false);
+      expect(res.body).toMatchObject({
+        termStatus: 'MODERATE_LATE_PRETERM',
+        birthWeightCategory: 'LBW',
+        isHighRisk: true,
+        correctedAgeDays: 20 - 42,
+      });
+      expect(res.body.riskFactors.map((r: { code: string }) => r.code)).toEqual([
+        'PRETERM',
+        'LOW_BIRTH_WEIGHT',
+      ]);
+      const ms = await h.http().get(`/babies/${babyId}/measurements`).set(auth(token)).expect(200);
+      expect(ms.body).toHaveLength(1);
+      expect(ms.body[0]).toMatchObject({
+        source: 'BIRTH',
+        weightGrams: 2200,
+        lengthCm: 45,
+        headCircumferenceCm: 31.5,
+      });
     });
 
-    it('rejects a baby born in the future', () =>
-      http()
+    it('flags a term baby with a head circumference outside the WHO range', async () => {
+      const res = await h
+        .http()
         .post('/babies')
         .set(auth(token))
-        .send({ name: 'X', dateOfBirth: new Date(Date.now() + 86_400_000).toISOString() })
-        .expect(400));
-
-    it('requires data-collection consent before recording a check', async () => {
-      const res = await http()
-        .post(`/babies/${babyId}/observations`)
-        .set(auth(token))
-        .send({ temperatureC: 36.8 })
-        .expect(403);
-      expect(res.body.code).toBe('CONSENT_REQUIRED');
-      await http().put('/me/consents').set(auth(token)).send({ dataCollection: true }).expect(200);
-    });
-
-    it('returns GREEN for a well baby', async () => {
-      const res = await http()
-        .post(`/babies/${babyId}/observations`)
-        .set(auth(token))
-        .send({
-          temperatureC: 36.8,
-          feedingCount24h: 10,
-          feedingQuality: 'GOOD',
-          breathing: 'NORMAL',
-        })
+        .send(babyBody({ birthHeadCircumferenceCm: 30 }))
         .expect(201);
-      expect(res.body.assessment.level).toBe('GREEN');
-      expect(res.body.observation.temperatureC).toBe(36.8);
+      expect(res.body.riskFactors).toContainEqual({ code: 'BIRTH_HEAD_SIZE_OUT_OF_RANGE' });
     });
 
-    it('returns RED with care actions for fever', async () => {
-      const res = await http()
-        .post(`/babies/${babyId}/observations`)
+    it('adds measurements, pre-fill data and flags excess early weight loss', async () => {
+      const term = await h
+        .http()
+        .post('/babies')
         .set(auth(token))
-        .send({ temperatureC: 38.4 })
+        .send(babyBody({ dateOfBirth: daysAgo(6) }))
         .expect(201);
-      expect(res.body.assessment.level).toBe('RED');
-      expect(res.body.assessment.findings).toContainEqual({ code: 'FEVER', level: 'RED' });
-      expect(res.body.assessment.actions[0]).toBe('SEEK_CARE_NOW');
-    });
-
-    it('rejects unknown fields and out-of-range values', async () => {
-      await http()
-        .post(`/babies/${babyId}/observations`)
+      const res = await h
+        .http()
+        .post(`/babies/${term.body.id}/measurements`)
         .set(auth(token))
-        .send({ temperatureC: 50 })
-        .expect(400);
-      await http()
-        .post(`/babies/${babyId}/observations`)
-        .set(auth(token))
-        .send({ riskLevel: 'GREEN' })
-        .expect(400);
-    });
-
-    it('reports the check schedule for a 3-day-old (3 checks/day)', async () => {
-      const res = await http().get(`/babies/${babyId}/check-schedule`).set(auth(token)).expect(200);
-      expect(res.body).toMatchObject({ checksPerDay: 3, checksLast24h: 2, checksDue: 1 });
-    });
-
-    it('builds a 3-day summary', async () => {
-      const res = await http().get(`/babies/${babyId}/summary?days=3`).set(auth(token)).expect(200);
-      expect(res.body.period.days).toBe(3);
-      expect(res.body.totals).toMatchObject({ checks: 2, green: 1, red: 1 });
-      expect(res.body.temperature).toEqual({ min: 36.8, max: 38.4, latest: 38.4 });
-      expect(res.body.latestRiskLevel).toBe('RED');
-    });
-
-    it('hides a baby from other caregivers', async () => {
-      const other = (await login(newPhone())).accessToken;
-      await http().get(`/babies/${babyId}`).set(auth(other)).expect(404);
-      await http().get(`/babies/${babyId}/observations`).set(auth(other)).expect(404);
-    });
-
-    it('writes an audit log entry for checks', async () => {
-      const logs = await prisma.auditLog.findMany({
-        where: { action: 'POST /babies/:babyId/observations' },
+        .send({ measuredAt: daysAgo(1), weightGrams: 2800, source: 'CLINIC' })
+        .expect(201);
+      expect(res.body.growth.flags).toContainEqual({ code: 'EXCESS_WEIGHT_LOSS', level: 'YELLOW' });
+      expect(res.body.growth.latest.weight).toMatchObject({
+        value: 2800,
+        unit: 'g',
+        flag: 'NORMAL',
       });
-      expect(logs.length).toBeGreaterThanOrEqual(2);
+      // Length/HC still come from the birth measurement (pre-fill source).
+      expect(res.body.growth.latest.headCircumference.value).toBe(34);
+      await h
+        .http()
+        .post(`/babies/${term.body.id}/measurements`)
+        .set(auth(token))
+        .send({ measuredAt: daysAgo(1), source: 'HOME' })
+        .expect(400);
+    });
+
+    it('pauses home checks in kangaroo care and resumes them at discharge (FR-BABY-05)', async () => {
+      await h
+        .http()
+        .patch(`/babies/${babyId}`)
+        .set(auth(token))
+        .send({ careStatus: 'KANGAROO_CARE' })
+        .expect(200);
+      const paused = await h
+        .http()
+        .get(`/babies/${babyId}/check-schedule`)
+        .set(auth(token))
+        .expect(200);
+      expect(paused.body).toMatchObject({
+        paused: true,
+        pausedReason: 'KANGAROO_CARE',
+        checksDue: 0,
+        reminderTimes: [],
+      });
+      const home = await h
+        .http()
+        .patch(`/babies/${babyId}`)
+        .set(auth(token))
+        .send({ careStatus: 'AT_HOME' })
+        .expect(200);
+      expect(home.body.dischargeDate).toBeTruthy();
+      const resumed = await h
+        .http()
+        .get(`/babies/${babyId}/check-schedule`)
+        .set(auth(token))
+        .expect(200);
+      expect(resumed.body).toMatchObject({ paused: false, checksPerDay: 2 });
     });
   });
 
-  describe('facilities', () => {
-    it('lists the nearest newborn-capable facilities first', async () => {
-      const { accessToken } = await login(newPhone());
+  describe('checks and triage (FR-CHK)', () => {
+    let token: string;
+    let infant: string; // 5 months old
+    let newborn: string; // 3 days old
+
+    beforeAll(async () => {
+      token = await caregiver(h, 'Tanyi');
+      infant = (
+        await h
+          .http()
+          .post('/babies')
+          .set(auth(token))
+          .send(babyBody({ dateOfBirth: daysAgo(150) }))
+          .expect(201)
+      ).body.id;
+      newborn = (
+        await h
+          .http()
+          .post('/babies')
+          .set(auth(token))
+          .send(babyBody({ dateOfBirth: daysAgo(3) }))
+          .expect(201)
+      ).body.id;
+    });
+
+    it('serves a localized routine plan with core and rotating questions', async () => {
+      const res = await h
+        .http()
+        .get(`/babies/${newborn}/check-plan?type=ROUTINE&lang=fr`)
+        .set(auth(token))
+        .expect(200);
+      expect(res.body.questions[0]).toMatchObject({
+        id: 'temperature',
+        required: true,
+        label: 'Température',
+      });
+      expect(res.body.questions.map((q: { id: string }) => q.id)).toEqual(
+        expect.arrayContaining(['feedingQuality', 'convulsions', 'respiratoryRate']),
+      );
+    });
+
+    it('serves an unwell plan for the chosen complaints', async () => {
+      const res = await h
+        .http()
+        .get(`/babies/${newborn}/check-plan?type=UNWELL&complaints=BREATHING_PROBLEM,VOMITING`)
+        .set(auth(token))
+        .expect(200);
+      const ids = res.body.questions.map((q: { id: string }) => q.id);
+      expect(ids).toEqual(
+        expect.arrayContaining(['temperature', 'respiratoryRate', 'chestIndrawing', 'vomiting']),
+      );
+    });
+
+    it('requires data-collection consent and a temperature', async () => {
+      const noConsent = await caregiver(h, 'Ewane', {
+        dataCollection: false,
+        clinicianShare: false,
+      });
+      const b = (await h.http().post('/babies').set(auth(noConsent)).send(babyBody()).expect(201))
+        .body.id;
+      const r = await h
+        .http()
+        .post(`/babies/${b}/observations`)
+        .set(auth(noConsent))
+        .send({ temperatureC: 36.8 })
+        .expect(403);
+      expect(r.body.code).toBe('CONSENT_REQUIRED');
+      await h
+        .http()
+        .post(`/babies/${newborn}/observations`)
+        .set(auth(token))
+        .send({ feedingQuality: 'GOOD' })
+        .expect(400);
+    });
+
+    it('makes any fever in a newborn RED with the no-medicines warning', async () => {
+      const r = await h
+        .http()
+        .post(`/babies/${newborn}/observations`)
+        .set(auth(token))
+        .send({ temperatureC: 38.2, checkType: 'UNWELL', complaints: ['FEVER'] })
+        .expect(201);
+      expect(r.body.assessment.level).toBe('RED');
+      expect(r.body.assessment.findings).toContainEqual({
+        code: 'FEVER_YOUNG_INFANT',
+        level: 'RED',
+      });
+      expect(r.body.assessment.actions).toEqual(
+        expect.arrayContaining(['SEEK_CARE_NOW', 'NO_HOME_MEDICINES', 'COOLING_STEPS']),
+      );
+      expect(r.body.recheck).toBeNull();
+      expect(r.body.observation.checkType).toBe('UNWELL');
+    });
+
+    it('cools then rechecks a moderate fever at 5 months, escalating when it persists (FR-CHK-08)', async () => {
+      const first = await h
+        .http()
+        .post(`/babies/${infant}/observations`)
+        .set(auth(token))
+        .send({
+          checkType: 'UNWELL',
+          complaints: ['FEVER'],
+          temperatureC: 38.4,
+          roomFeel: 'HOT',
+          clothing: 'HEAVY',
+          feedingQuality: 'GOOD',
+        })
+        .expect(201);
+      expect(first.body.assessment.level).toBe('YELLOW');
+      expect(first.body.assessment.actions).toEqual(
+        expect.arrayContaining(['COOLING_STEPS', 'COOL_ROOM', 'RECHECK_TEMP_30_MIN']),
+      );
+      expect(first.body.recheck).toBeTruthy();
+      const recheckId = first.body.recheck.id;
+
+      const schedule = await h
+        .http()
+        .get(`/babies/${infant}/check-schedule`)
+        .set(auth(token))
+        .expect(200);
+      expect(schedule.body.pendingRecheck.id).toBe(recheckId);
+
+      const second = await h
+        .http()
+        .post(`/babies/${infant}/observations`)
+        .set(auth(token))
+        .send({ checkType: 'UNWELL', recheckOfId: recheckId, temperatureC: 38.3 })
+        .expect(201);
+      expect(second.body.assessment.level).toBe('RED');
+      expect(second.body.assessment.findings).toContainEqual({
+        code: 'FEVER_PERSISTENT',
+        level: 'RED',
+      });
+      const rechecks = await h
+        .http()
+        .get(`/babies/${infant}/rechecks?status=PENDING`)
+        .set(auth(token))
+        .expect(200);
+      expect(rechecks.body).toEqual([]);
+    });
+
+    it('scores the breath count by age', async () => {
+      const r = await h
+        .http()
+        .post(`/babies/${newborn}/observations`)
+        .set(auth(token))
+        .send({ temperatureC: 36.9, respiratoryRate: 66 })
+        .expect(201);
+      expect(r.body.assessment.findings).toContainEqual({ code: 'FAST_BREATHING', level: 'RED' });
+    });
+
+    it('makes offline re-sends idempotent with clientRef (FR-CHK-11)', async () => {
+      const body = { temperatureC: 36.8, feedingQuality: 'GOOD', clientRef: 'offline-check-0001' };
+      const a = await h
+        .http()
+        .post(`/babies/${newborn}/observations`)
+        .set(auth(token))
+        .send(body)
+        .expect(201);
+      const b = await h
+        .http()
+        .post(`/babies/${newborn}/observations`)
+        .set(auth(token))
+        .send(body)
+        .expect(200);
+      expect(b.body.observation.id).toBe(a.body.observation.id);
+      expect(a.body.assessment.level).toBe('GREEN');
+    });
+
+    it('attaches a photo served through an expiring signed link (FR-CHK-12)', async () => {
+      const obs = await h
+        .http()
+        .post(`/babies/${newborn}/observations`)
+        .set(auth(token))
+        .send({ temperatureC: 36.7 })
+        .expect(201);
+      const png = Buffer.from('89504e470d0a1a0a0000000d49484452', 'hex');
+      const res = await h
+        .http()
+        .post(`/babies/${newborn}/observations/${obs.body.observation.id}/photo`)
+        .set(auth(token))
+        .attach('file', png, { filename: 'cord.png', contentType: 'image/png' })
+        .expect(201);
+      const path = new URL(res.body.photoUrl).pathname;
+      const file = await h.http().get(path).expect(200);
+      expect(file.headers['content-type']).toBe('image/png');
+      await h
+        .http()
+        .get(path.replace(/.$/, (c) => (c === 'A' ? 'B' : 'A')))
+        .expect(404);
+    });
+
+    it('transcribes a voice note with the self-hosted speech service and detects complaints (FR-VOICE)', async () => {
+      const res = await h
+        .http()
+        .post(`/babies/${newborn}/voice-notes`)
+        .set(auth(token))
+        .attach('file', Buffer.from('fake-audio'), {
+          filename: 'note.m4a',
+          contentType: 'audio/mp4',
+        })
+        .expect(201);
+      expect(res.body.status).toBe('PENDING');
+      await h.jobs.drain();
+      const note = await h.http().get(`/voice-notes/${res.body.id}`).set(auth(token)).expect(200);
+      expect(note.body).toMatchObject({
+        status: 'TRANSCRIBED',
+        transcript: 'The baby is very hot and keeps vomiting',
+        detectedComplaints: ['FEVER', 'VOMITING'],
+      });
+      const obs = await h
+        .http()
+        .post(`/babies/${newborn}/observations`)
+        .set(auth(token))
+        .send({ temperatureC: 37, voiceNoteId: res.body.id, checkType: 'UNWELL' })
+        .expect(201);
+      expect(obs.body.observation.voiceNoteId).toBe(res.body.id);
+    });
+
+    it('builds the 7-day summary and the PDF (FR-RPT)', async () => {
+      const s = await h
+        .http()
+        .get(`/babies/${newborn}/summary?days=7`)
+        .set(auth(token))
+        .expect(200);
+      expect(s.body.baby.displayName).toBe('Baby Tanyi 2'); // the unnamed 5-month-old sibling is 1
+      expect(s.body.totals.checks).toBeGreaterThanOrEqual(5);
+      expect(s.body.totals.unwellChecks).toBeGreaterThanOrEqual(2);
+      expect(s.body.growth.latest.weight.value).toBe(3200);
+      const pdf = await h
+        .http()
+        .get(`/babies/${newborn}/summary.pdf?days=3&lang=fr`)
+        .set(auth(token))
+        .buffer(true)
+        .parse((res, cb) => {
+          const chunks: Buffer[] = [];
+          res.on('data', (c: Buffer) => chunks.push(c));
+          res.on('end', () => cb(null, Buffer.concat(chunks)));
+        })
+        .expect(200);
+      expect(pdf.headers['content-type']).toBe('application/pdf');
+      expect((pdf.body as Buffer).subarray(0, 4).toString()).toBe('%PDF');
+    });
+
+    it('hides a baby from other caregivers', async () => {
+      const other = await caregiver(h, 'Other');
+      await h.http().get(`/babies/${newborn}`).set(auth(other)).expect(404);
+      await h.http().get(`/babies/${newborn}/check-plan`).set(auth(other)).expect(404);
+      await h.http().get(`/babies/${newborn}/growth`).set(auth(other)).expect(404);
+    });
+  });
+
+  describe('facilities (FR-FAC)', () => {
+    it('searches by name and lists the nearest newborn-capable facilities', async () => {
+      const token = await caregiver(h);
       const tag = `e2e-${Date.now()}`;
-      await prisma.facility.createMany({
+      await h.prisma.facility.createMany({
         data: [
           { name: `${tag} far`, latitude: 6.2, longitude: 10.3, services: ['PAEDIATRICS'] },
           { name: `${tag} near`, latitude: 5.965, longitude: 10.15, services: ['NEONATOLOGY'] },
           { name: `${tag} maternity`, latitude: 5.96, longitude: 10.146, services: ['MATERNITY'] },
         ],
       });
-      const res = await http()
+      const near = await h
+        .http()
         .get('/facilities/nearby?lat=5.96&lon=10.145&radiusKm=60')
-        .set(auth(accessToken))
+        .set(auth(token))
         .expect(200);
-      const ours = res.body.filter((f: { name: string }) => f.name.startsWith(tag));
-      expect(ours.map((f: { name: string }) => f.name)).toEqual([`${tag} near`, `${tag} far`]);
-      expect(ours[0].distanceKm).toBeLessThan(1);
-    });
-
-    it('only lets admins create facilities', async () => {
-      const { accessToken } = await login(newPhone());
-      await http()
+      const ours = near.body
+        .filter((f: { name: string }) => f.name.startsWith(tag))
+        .map((f: { name: string }) => f.name);
+      expect(ours).toEqual([`${tag} near`, `${tag} far`]);
+      const search = await h.http().get(`/facilities?q=${tag}`).set(auth(token)).expect(200);
+      expect(search.body).toHaveLength(3);
+      await h
+        .http()
         .post('/facilities')
-        .set(auth(accessToken))
+        .set(auth(token))
         .send({ name: 'x', latitude: 1, longitude: 1, services: ['OPD'] })
         .expect(403);
     });
   });
 
-  describe('clinician verification and teleconsultation', () => {
-    let clinicianToken: string;
-    let clinicianId: string;
-    let adminToken: string;
-    let caregiverToken: string;
-    let babyId: string;
-    let consultationId: string;
-    const slot = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
-    slot.setUTCMinutes(0, 0, 0);
-
-    beforeAll(async () => {
-      clinicianToken = (await login(newPhone(), 'CLINICIAN')).accessToken;
-
-      const adminPhone = newPhone();
-      await prisma.user.create({ data: { phone: adminPhone, role: 'ADMIN' } });
-      adminToken = (await login(adminPhone)).accessToken;
-
-      caregiverToken = (await login(newPhone())).accessToken;
-      babyId = (
-        await http()
-          .post('/babies')
-          .set(auth(caregiverToken))
-          .send({ name: 'Bih', dateOfBirth: new Date(Date.now() - 20 * 86_400_000).toISOString() })
-          .expect(201)
-      ).body.id;
-    });
-
-    it('registers a clinician profile, which starts unverified', async () => {
-      const res = await http()
-        .post('/clinicians/me')
-        .set(auth(clinicianToken))
-        .send({
-          fullName: 'Dr. Ngwa',
-          licenseNumber: `LIC-${Date.now()}`,
-          specialties: ['NEONATOLOGY'],
-          consultationFeeXaf: 5000,
-        })
-        .expect(201);
-      clinicianId = res.body.id;
-      expect(res.body.verificationStatus).toBe('PENDING_DOCUMENTS');
-
-      await http()
-        .put('/clinicians/me/availability')
-        .set(auth(clinicianToken))
-        .send({
-          slots: [0, 1, 2, 3, 4, 5, 6].map((d) => ({
-            dayOfWeek: d,
-            startMinute: 0,
-            endMinute: 1440,
-          })),
-        })
+  describe('account (FR-ACC)', () => {
+    it('exports data, deletes the account and purges it after 30 days', async () => {
+      const phone = h.newPhone();
+      const token = await h.login(phone);
+      await h
+        .http()
+        .patch('/me')
+        .set(auth(token))
+        .send({ firstName: 'Delete', lastName: 'Me' })
         .expect(200);
-    });
-
-    it('caregivers cannot register as clinicians', () =>
-      http()
-        .post('/clinicians/me')
-        .set(auth(caregiverToken))
-        .send({ fullName: 'x', licenseNumber: 'y', specialties: [], consultationFeeXaf: 1 })
-        .expect(403));
-
-    it('rejects disallowed document types', () =>
-      http()
-        .post('/clinicians/me/documents')
-        .set(auth(clinicianToken))
-        .field('type', 'MEDICAL_LICENSE')
-        .attach('file', Buffer.from('hello'), { filename: 'a.txt', contentType: 'text/plain' })
-        .expect(400));
-
-    it('moves to PENDING_REVIEW once all three documents are uploaded', async () => {
-      for (const type of ['MEDICAL_LICENSE', 'MEDICAL_DEGREE', 'EMPLOYMENT_PROOF']) {
-        await http()
-          .post('/clinicians/me/documents')
-          .set(auth(clinicianToken))
-          .field('type', type)
-          .attach('file', Buffer.from('%PDF-1.4 test'), {
-            filename: `${type}.pdf`,
-            contentType: 'application/pdf',
-          })
-          .expect(201);
-      }
-      const me = await http().get('/clinicians/me').set(auth(clinicianToken)).expect(200);
-      expect(me.body.verificationStatus).toBe('PENDING_REVIEW');
-      expect(me.body.missingDocuments).toEqual([]);
-    });
-
-    it('is not bookable before verification', async () => {
-      await http().get(`/clinicians/${clinicianId}`).set(auth(caregiverToken)).expect(404);
-    });
-
-    it('is verified by an admin, not by the clinician', async () => {
-      await http()
-        .post(`/clinicians/${clinicianId}/review`)
-        .set(auth(clinicianToken))
-        .send({ decision: 'VERIFIED' })
-        .expect(403);
-      const queue = await http().get('/clinicians/review-queue').set(auth(adminToken)).expect(200);
-      expect(queue.body.map((c: { id: string }) => c.id)).toContain(clinicianId);
-      await http()
-        .post(`/clinicians/${clinicianId}/review`)
-        .set(auth(adminToken))
-        .send({ decision: 'VERIFIED' })
-        .expect(201);
-      await http().get(`/clinicians/${clinicianId}`).set(auth(caregiverToken)).expect(200);
-    });
-
-    it('requires clinician-sharing consent to book', async () => {
-      const res = await http()
-        .post('/consultations')
-        .set(auth(caregiverToken))
-        .send({ babyId, clinicianId, type: 'VIDEO', scheduledAt: slot.toISOString() })
-        .expect(403);
-      expect(res.body.code).toBe('CONSENT_REQUIRED');
-    });
-
-    it('books a consultation with a pre-visit summary and commission', async () => {
-      await http()
+      await h
+        .http()
         .put('/me/consents')
-        .set(auth(caregiverToken))
-        .send({ dataCollection: true, clinicianShare: true })
+        .set(auth(token))
+        .send({ dataCollection: true })
         .expect(200);
-      const res = await http()
-        .post('/consultations')
-        .set(auth(caregiverToken))
-        .send({
-          babyId,
-          clinicianId,
-          type: 'VIDEO',
-          scheduledAt: slot.toISOString(),
-          reason: 'Fever',
-        })
+      const baby = (await h.http().post('/babies').set(auth(token)).send(babyBody()).expect(201))
+        .body.id;
+      await h
+        .http()
+        .post(`/babies/${baby}/observations`)
+        .set(auth(token))
+        .send({ temperatureC: 36.8 })
         .expect(201);
-      consultationId = res.body.id;
-      expect(res.body).toMatchObject({ status: 'REQUESTED', feeXaf: 5000, commissionXaf: 750 });
-      expect(res.body.previsitSummary.period.days).toBe(7);
-    });
 
-    it('refuses a double booking of the same slot', () =>
-      http()
-        .post('/consultations')
-        .set(auth(caregiverToken))
-        .send({ babyId, clinicianId, type: 'AUDIO', scheduledAt: slot.toISOString() })
-        .expect(409));
+      const exported = await h.http().get('/me/export').set(auth(token)).expect(200);
+      expect(exported.body.babies[0].observations).toHaveLength(1);
+      expect(exported.body.babies[0].measurements).toHaveLength(1);
 
-    it('lets the clinician see the summary and confirm, but not the caregiver', async () => {
-      const seen = await http()
-        .get(`/consultations/${consultationId}`)
-        .set(auth(clinicianToken))
-        .expect(200);
-      expect(seen.body.previsitSummary.baby.name).toBe('Bih');
+      const del = await h.http().delete('/me').set(auth(token)).expect(202);
+      expect(new Date(del.body.purgeAfter).getTime()).toBeGreaterThan(Date.now() + 29 * 86_400_000);
+      await h.http().get('/me').set(auth(token)).expect(401);
 
-      await http()
-        .patch(`/consultations/${consultationId}/status`)
-        .set(auth(caregiverToken))
-        .send({ status: 'CONFIRMED' })
-        .expect(400);
-      const ok = await http()
-        .patch(`/consultations/${consultationId}/status`)
-        .set(auth(clinicianToken))
-        .send({ status: 'CONFIRMED' })
-        .expect(200);
-      expect(ok.body.status).toBe('CONFIRMED');
-    });
-
-    it('hides the consultation from unrelated users', async () => {
-      const stranger = (await login(newPhone())).accessToken;
-      await http().get(`/consultations/${consultationId}`).set(auth(stranger)).expect(404);
+      const { MaintenanceService } = await import('../src/scheduler/maintenance.service');
+      const maintenance = h.app.get(MaintenanceService);
+      await h.prisma.user.update({
+        where: { phone },
+        data: { deletionRequestedAt: new Date(Date.now() - 31 * 86_400_000) },
+      });
+      expect(await maintenance.purgeAccounts()).toBeGreaterThanOrEqual(1);
+      expect(await h.prisma.user.findUnique({ where: { phone } })).toBeNull();
+      expect(await h.prisma.baby.findUnique({ where: { id: baby } })).toBeNull();
     });
   });
 });

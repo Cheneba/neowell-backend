@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -18,9 +19,11 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { ClinicianDocumentType, Role } from '../generated/prisma/enums';
 import { CliniciansService } from './clinicians.service';
 import {
+  AvailableNowDto,
+  ListCliniciansQuery,
   RegisterClinicianDto,
-  ReviewClinicianDto,
   SetAvailabilityDto,
+  SlotsQuery,
   UpdateClinicianDto,
   UploadDocumentDto,
 } from './dto/clinician.dto';
@@ -31,10 +34,10 @@ import {
 export class CliniciansController {
   constructor(private readonly clinicians: CliniciansService) {}
 
-  /** Verified clinicians available for teleconsultation. */
+  /** Verified clinicians; filter by medium or "available now". */
   @Get()
-  list() {
-    return this.clinicians.listVerified();
+  list(@Query() q: ListCliniciansQuery) {
+    return this.clinicians.listVerified(q);
   }
 
   // Static routes are declared before `:id` so they are not captured by it.
@@ -57,7 +60,16 @@ export class CliniciansController {
     return this.clinicians.update(user.id, dto);
   }
 
-  /** Upload a medical license, degree or proof of employment (PDF/JPEG/PNG). */
+  /** Profile photo — required for verification (trust, FR-CLIN-01). */
+  @Post('me/photo')
+  @Roles(Role.CLINICIAN)
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  photo(@CurrentUser() user: AuthUser, @UploadedFile() file?: Express.Multer.File) {
+    return this.clinicians.uploadPhoto(user.id, file);
+  }
+
+  /** Upload a medical licence, degree or proof of employment (PDF/JPEG/PNG). */
   @Post('me/documents')
   @Roles(Role.CLINICIAN)
   @UseInterceptors(FileInterceptor('file'))
@@ -86,24 +98,27 @@ export class CliniciansController {
     return this.clinicians.setAvailability(user.id, dto);
   }
 
-  @Get('review-queue')
-  @Roles(Role.ADMIN)
-  reviewQueue() {
-    return this.clinicians.reviewQueue();
+  @Put('me/available-now')
+  @Roles(Role.CLINICIAN)
+  availableNow(@CurrentUser() user: AuthUser, @Body() dto: AvailableNowDto) {
+    return this.clinicians.setAvailableNow(user.id, dto.minutes);
   }
 
-  @Post(':id/review')
-  @Roles(Role.ADMIN)
-  review(
-    @CurrentUser() admin: AuthUser,
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: ReviewClinicianDto,
-  ) {
-    return this.clinicians.review(admin.id, id, dto);
+  @Get('me/earnings')
+  @Roles(Role.CLINICIAN)
+  earnings(@CurrentUser() user: AuthUser) {
+    return this.clinicians.earnings(user.id);
   }
 
   @Get(':id')
   get(@Param('id', ParseUUIDPipe) id: string) {
     return this.clinicians.getVerified(id);
+  }
+
+  /** Free 30-minute slots for booking. */
+  @Get(':id/slots')
+  @Roles(Role.CAREGIVER)
+  slots(@Param('id', ParseUUIDPipe) id: string, @Query() q: SlotsQuery) {
+    return this.clinicians.slots(id, q.days);
   }
 }

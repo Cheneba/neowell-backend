@@ -168,22 +168,22 @@
 <text x="1172" y="142" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
 <text x="862" y="161" font-size="11" font-weight="bold" fill="#5E6E82"></text>
 <text x="890" y="161" font-size="12.5" fill="#1E2B3C">sex</text>
-<text x="1172" y="161" font-size="12" fill="#5E6E82" text-anchor="end">Sex</text>
+<text x="1172" y="161" font-size="12" fill="#5E6E82" text-anchor="end">Sex?</text>
 <text x="862" y="180" font-size="11" font-weight="bold" fill="#5E6E82"></text>
 <text x="890" y="180" font-size="12.5" fill="#1E2B3C">dateOfBirth</text>
 <text x="1172" y="180" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
 <text x="862" y="199" font-size="11" font-weight="bold" fill="#5E6E82"></text>
 <text x="890" y="199" font-size="12.5" fill="#1E2B3C">gestationalAgeWeeks</text>
-<text x="1172" y="199" font-size="12" fill="#5E6E82" text-anchor="end">Int</text>
+<text x="1172" y="199" font-size="12" fill="#5E6E82" text-anchor="end">Int?</text>
 <text x="862" y="218" font-size="11" font-weight="bold" fill="#5E6E82"></text>
 <text x="890" y="218" font-size="12.5" fill="#1E2B3C">birthWeightGrams</text>
-<text x="1172" y="218" font-size="12" fill="#5E6E82" text-anchor="end">Int</text>
+<text x="1172" y="218" font-size="12" fill="#5E6E82" text-anchor="end">Int?</text>
 <text x="862" y="237" font-size="11" font-weight="bold" fill="#5E6E82"></text>
 <text x="890" y="237" font-size="12.5" fill="#1E2B3C">birthLengthCm</text>
-<text x="1172" y="237" font-size="12" fill="#5E6E82" text-anchor="end">Decimal</text>
+<text x="1172" y="237" font-size="12" fill="#5E6E82" text-anchor="end">Decimal?</text>
 <text x="862" y="256" font-size="11" font-weight="bold" fill="#5E6E82"></text>
 <text x="890" y="256" font-size="12.5" fill="#1E2B3C">birthHeadCircumferenceCm</text>
-<text x="1172" y="256" font-size="12" fill="#5E6E82" text-anchor="end">Decimal</text>
+<text x="1172" y="256" font-size="12" fill="#5E6E82" text-anchor="end">Decimal?</text>
 <text x="862" y="275" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
 <text x="890" y="275" font-size="12.5" fill="#1E2B3C">birthFacilityId</text>
 <text x="1172" y="275" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
@@ -366,7 +366,7 @@
 <text x="344" y="888" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
 <text x="34" y="907" font-size="11" font-weight="bold" fill="#5E6E82"></text>
 <text x="62" y="907" font-size="12.5" fill="#1E2B3C">temperatureC</text>
-<text x="344" y="907" font-size="12" fill="#5E6E82" text-anchor="end">Decimal</text>
+<text x="344" y="907" font-size="12" fill="#5E6E82" text-anchor="end">Decimal?</text>
 <text x="34" y="926" font-size="11" font-weight="bold" fill="#5E6E82"></text>
 <text x="62" y="926" font-size="12.5" fill="#1E2B3C">temperatureSrc</text>
 <text x="344" y="926" font-size="12" fill="#5E6E82" text-anchor="end">TemperatureSource</text>

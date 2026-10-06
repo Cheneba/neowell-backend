@@ -7,7 +7,8 @@ import { Env } from './config/env';
 import { setupApp } from './setup-app';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // rawBody: webhook signatures are computed over the exact bytes received.
+  const app = await NestFactory.create(AppModule, { rawBody: true });
   setupApp(app);
   const config = app.get<ConfigService<Env, true>>(ConfigService);
 

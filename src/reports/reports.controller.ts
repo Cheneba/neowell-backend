@@ -1,5 +1,6 @@
-import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
+import { Controller, Get, Param, ParseUUIDPipe, Query, Res, StreamableFile } from '@nestjs/common';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import type { Response } from 'express';
 import { BabiesService } from '../babies/babies.service';
 import { AuthUser } from '../common/auth-user';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -10,14 +11,14 @@ import { ReportsService } from './reports.service';
 @ApiTags('reports')
 @ApiBearerAuth()
 @Roles(Role.CAREGIVER)
-@Controller('babies/:babyId/summary')
+@Controller('babies/:babyId')
 export class ReportsController {
   constructor(
     private readonly reports: ReportsService,
     private readonly babies: BabiesService,
   ) {}
 
-  @Get()
+  @Get('summary')
   @ApiQuery({ name: 'days', enum: [3, 7], required: false })
   async summary(
     @CurrentUser() user: AuthUser,
@@ -26,5 +27,25 @@ export class ReportsController {
   ) {
     await this.babies.findOwned(user.id, babyId);
     return this.reports.summary(babyId, days === '3' ? 3 : 7);
+  }
+
+  @Get('summary.pdf')
+  @ApiQuery({ name: 'days', enum: [3, 7], required: false })
+  @ApiQuery({ name: 'lang', enum: ['en', 'fr'], required: false })
+  async pdf(
+    @CurrentUser() user: AuthUser,
+    @Param('babyId', ParseUUIDPipe) babyId: string,
+    @Res({ passthrough: true }) res: Response,
+    @Query('days') days?: string,
+    @Query('lang') lang?: string,
+  ) {
+    await this.babies.findOwned(user.id, babyId);
+    const pdf = await this.reports.pdf(babyId, days === '3' ? 3 : 7, lang === 'fr' ? 'fr' : 'en');
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader(
+      'Content-Disposition',
+      `inline; filename="neowell-summary-${days === '3' ? 3 : 7}d.pdf"`,
+    );
+    return new StreamableFile(pdf);
   }
 }

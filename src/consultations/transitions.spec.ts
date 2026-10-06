@@ -1,21 +1,54 @@
-import { canTransition } from './transitions';
+import { refundOnCancel, transition } from './transitions';
 
-describe('canTransition', () => {
-  it('lets the clinician confirm, start and complete', () => {
-    expect(canTransition('REQUESTED', 'CONFIRMED', 'CLINICIAN')).toBe(true);
-    expect(canTransition('CONFIRMED', 'IN_PROGRESS', 'CLINICIAN')).toBe(true);
-    expect(canTransition('IN_PROGRESS', 'COMPLETED', 'CLINICIAN')).toBe(true);
+describe('transition', () => {
+  it('lets the clinician accept, start and complete', () => {
+    expect(transition('accept', 'REQUESTED', 'CLINICIAN')).toBe('CONFIRMED');
+    expect(transition('start', 'CONFIRMED', 'CLINICIAN')).toBe('IN_PROGRESS');
+    expect(transition('complete', 'IN_PROGRESS', 'CLINICIAN')).toBe('COMPLETED');
+    expect(transition('complete', 'CONFIRMED', 'CLINICIAN')).toBe('COMPLETED');
   });
 
-  it('lets the caregiver cancel before the call starts, but not confirm', () => {
-    expect(canTransition('REQUESTED', 'CANCELLED', 'CAREGIVER')).toBe(true);
-    expect(canTransition('CONFIRMED', 'CANCELLED', 'CAREGIVER')).toBe(true);
-    expect(canTransition('IN_PROGRESS', 'CANCELLED', 'CAREGIVER')).toBe(false);
-    expect(canTransition('REQUESTED', 'CONFIRMED', 'CAREGIVER')).toBe(false);
+  it('does not let the caregiver act for the clinician', () => {
+    expect(transition('accept', 'REQUESTED', 'CAREGIVER')).toBeNull();
+    expect(transition('complete', 'IN_PROGRESS', 'CAREGIVER')).toBeNull();
+  });
+
+  it('allows cancelling only before the call starts; unpaid only by the caregiver', () => {
+    expect(transition('cancel', 'AWAITING_PAYMENT', 'CAREGIVER')).toBe('CANCELLED');
+    expect(transition('cancel', 'AWAITING_PAYMENT', 'CLINICIAN')).toBeNull();
+    expect(transition('cancel', 'CONFIRMED', 'CLINICIAN')).toBe('CANCELLED');
+    expect(transition('cancel', 'IN_PROGRESS', 'CAREGIVER')).toBeNull();
   });
 
   it('treats terminal states as final', () => {
-    expect(canTransition('COMPLETED', 'CANCELLED', 'CLINICIAN')).toBe(false);
-    expect(canTransition('CANCELLED', 'CONFIRMED', 'CLINICIAN')).toBe(false);
+    for (const from of ['COMPLETED', 'CANCELLED', 'DECLINED', 'EXPIRED', 'NO_SHOW'] as const) {
+      expect(transition('accept', from, 'CLINICIAN')).toBeNull();
+      expect(transition('cancel', from, 'CAREGIVER')).toBeNull();
+    }
+  });
+});
+
+describe('refundOnCancel', () => {
+  const now = new Date('2026-10-06T10:00:00Z');
+  it('always refunds clinician cancellations and waiting requests', () => {
+    expect(refundOnCancel('CONFIRMED', 'CLINICIAN', new Date('2026-10-06T10:05:00Z'), now)).toBe(
+      true,
+    );
+    expect(refundOnCancel('REQUESTED', 'CAREGIVER', new Date('2026-10-06T10:05:00Z'), now)).toBe(
+      true,
+    );
+  });
+  it('refunds the caregiver only ≥ 1 hour before a confirmed start', () => {
+    expect(refundOnCancel('CONFIRMED', 'CAREGIVER', new Date('2026-10-06T11:00:00Z'), now)).toBe(
+      true,
+    );
+    expect(refundOnCancel('CONFIRMED', 'CAREGIVER', new Date('2026-10-06T10:59:00Z'), now)).toBe(
+      false,
+    );
+  });
+  it('never refunds an unpaid booking', () => {
+    expect(
+      refundOnCancel('AWAITING_PAYMENT', 'CAREGIVER', new Date('2026-10-07T10:00:00Z'), now),
+    ).toBe(false);
   });
 });

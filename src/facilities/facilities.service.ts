@@ -1,7 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { FacilityService } from '../generated/prisma/enums';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateFacilityDto, NearbyFacilitiesQuery } from './dto/facility.dto';
+import {
+  CreateFacilityDto,
+  NearbyFacilitiesQuery,
+  SearchFacilitiesQuery,
+  UpdateFacilityDto,
+} from './dto/facility.dto';
 import { boundingBox, haversineKm } from './geo';
 
 /** Services that can care for a sick newborn — the default referral filter. */
@@ -47,6 +52,31 @@ export class FacilitiesService {
     });
     if (!facility) throw new NotFoundException('Facility not found');
     return facility;
+  }
+
+  /** FR-FAC-02: name search, e.g. for picking the birth facility. */
+  search(q: SearchFacilitiesQuery) {
+    return this.prisma.facility.findMany({
+      where: { isActive: true, ...(q.q ? { name: { contains: q.q, mode: 'insensitive' } } : {}) },
+      orderBy: { name: 'asc' },
+      take: q.limit ?? 20,
+      select: { id: true, name: true, city: true, region: true, services: true },
+    });
+  }
+
+  async update(id: string, dto: UpdateFacilityDto) {
+    const { departments, ...data } = dto;
+    const exists = await this.prisma.facility.findUnique({ where: { id } });
+    if (!exists) throw new NotFoundException('Facility not found');
+    return this.prisma.$transaction(async (tx) => {
+      if (departments) {
+        await tx.facilityDepartment.deleteMany({ where: { facilityId: id } });
+        await tx.facilityDepartment.createMany({
+          data: departments.map((d) => ({ ...d, facilityId: id })),
+        });
+      }
+      return tx.facility.update({ where: { id }, data, include: { departments: true } });
+    });
   }
 
   create(dto: CreateFacilityDto) {

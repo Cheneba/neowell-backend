@@ -65,10 +65,10 @@ The schema has {{COUNTS}}, grouped into ten domains:
 | Rule | Where |
 |---|---|
 | A caregiver's `firstName` and `lastName` must be set before babies can be created (FR-ACC-01). | `POST /babies` |
-| Baby: `sex`, `dateOfBirth`, `gestationalAgeWeeks` (22–44), `birthWeightGrams` (300–7,000), `birthLengthCm` (25–65) and `birthHeadCircumferenceCm` (18–45) are required. `dateOfBirth` cannot be in the future; `dischargeDate` cannot be before birth. | `POST/PATCH /babies` |
+| Baby: `sex`, `dateOfBirth`, `gestationalAgeWeeks` (22–44), `birthWeightGrams` (300–7,000), `birthLengthCm` (25–65) and `birthHeadCircumferenceCm` (18–45) are required by the API. The columns are nullable only so that babies registered before v2 survive the migration; the app asks for the missing values (risk factor `MISSING_BIRTH_DATA`). `dateOfBirth` cannot be in the future; `dischargeDate` cannot be before birth. | `POST/PATCH /babies` |
 | Creating a baby also creates its BIRTH `Measurement` in the same transaction (FR-MEAS-02). | Babies service |
-| **Display name** = `givenName` if age ≥ 42 days and `givenName` set; otherwise "Baby {caregiver.lastName}", plus " 1/2/…" in birth order when the caregiver has several babies under 42 days. Computed on read. | `BabyPresenter` |
-| `Observation.temperatureC` is required (30.0–43.0). `(babyId, clientRef)` is unique: re-sending the same `clientRef` returns the stored check (FR-CHK-11). | `POST /babies/:id/observations` |
+| **Display name** = `givenName` if age ≥ 42 days and `givenName` set; otherwise "Baby {caregiver.lastName}", plus " 1/2/…" in birth order when several of the caregiver's babies use that name. Computed on read. | `babies/baby-facts.ts` |
+| `Observation.temperatureC` is required by the API (30.0–43.0); the column is nullable only for checks recorded before v2. `(babyId, clientRef)` is unique: re-sending the same `clientRef` returns the stored check (FR-CHK-11). | `POST /babies/:id/observations` |
 | `Observation.riskReasons` = `{ findings: [{code, level}], actions: [code] }`. `riskEngineVer` records the rules version. | Triage engine |
 | A `Recheck` is created when the engine returns `RECHECK_TEMP_30_MIN`. It becomes DONE when a check with `recheckOfId` is saved, or MISSED 2 h after `dueAt`. | Observations service, job J1 |
 | Consultation money: `commissionXaf = round(fee × PLATFORM_COMMISSION_PERCENT / 100)`, `clinicianEarningXaf = fee − commission`. Fixed at booking. | Consultations service |
@@ -111,7 +111,15 @@ Field tables below are generated from the Prisma schema. **Null** "—" means a 
 
 {{ENUMS}}
 
-## 7. Retention
+## 7. Migrations
+
+| Migration | What it does |
+|---|---|
+| `20260924154858_init` | v1 schema |
+| `20261006090000_v2_enum_values` | New enum values (kept separate: PostgreSQL cannot use a new enum value in the transaction that adds it) |
+| `20261006090100_v2_schema` | v2 tables and columns, **carrying v1 data over**: `fullName` → `firstName`/`lastName`; baby `name` → `givenName`; `birthHospital` → `birthFacilityName`; sex `UNKNOWN` → null; the single clinician fee → all three medium fees; consultation `type` → `medium`; `clinicianEarningXaf = feeXaf − commissionXaf` |
+
+## 8. Retention
 
 | Data | Retention |
 |---|---|
@@ -122,7 +130,7 @@ Field tables below are generated from the Prisma schema. **Null** "—" means a 
 | Account deletion | After 30 days: user, babies, measurements, checks, voice notes, devices and notifications deleted. Consultations, messages and drug charts kept with caregiver identity removed. (J9) |
 | Audit log | 2 years (to be confirmed with local regulation) |
 
-## 8. Planned: clinical knowledge base (FR-KB, awaiting the product owner's spreadsheet)
+## 9. Planned: clinical knowledge base (FR-KB, awaiting the product owner's spreadsheet)
 
 | Table | Fields |
 |---|---|

@@ -1,4 +1,5 @@
-// NeoWell data model — see README.md for the architecture overview.
+// NeoWell data model (v2). Specified in docs/02-database-schema-specification.md
+// and drawn in docs/03-database-diagram.excalidraw — keep all three in sync.
 
 generator client {
   provider     = "prisma-client"
@@ -10,7 +11,7 @@ datasource db {
   provider = "postgresql"
 }
 
-// ───────────────────────────── Identity & access ─────────────────────────────
+// ═════════════════════════════ Identity & access ═════════════════════════════
 
 enum Role {
   CAREGIVER
@@ -24,26 +25,35 @@ enum Locale {
 }
 
 model User {
-  id       String  @id @default(uuid())
-  phone    String  @unique // E.164, e.g. +2376XXXXXXXX
-  email    String? @unique
-  fullName String?
-  role     Role    @default(CAREGIVER)
-  locale   Locale  @default(en)
-  isActive Boolean @default(true)
+  id        String  @id @default(uuid())
+  phone     String  @unique // E.164, e.g. +2376XXXXXXXX. Never exposed to the other party of a consultation.
+  email     String? @unique
+  firstName String?
+  lastName  String? // Used for the hospital naming convention "Baby <lastName>"
+  role      Role    @default(CAREGIVER)
+  locale    Locale  @default(en)
+  region    String?
+  city      String?
+  isActive  Boolean @default(true)
 
-  // Explicit consent timestamps (null = not given). See PDR §9.
+  // Explicit consent timestamps (null = not given). PDR §9.
   consentDataCollectionAt DateTime?
   consentClinicianShareAt DateTime?
   consentRecordingAt      DateTime?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  deletionRequestedAt DateTime? // Account purge runs 30 days later (job J9)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
   babies        Baby[]
   clinician     ClinicianProfile?
   refreshTokens RefreshToken[]
   consultations Consultation[]    @relation("CaregiverConsultations")
+  devices       Device[]
+  notifications Notification[]
+  voiceNotes    VoiceNote[]
+  messages      Message[]
+  reviews       Review[]
   auditLogs     AuditLog[]
 }
 
@@ -72,34 +82,96 @@ model RefreshToken {
   @@index([userId])
 }
 
-// ───────────────────────────── Babies & daily checks ─────────────────────────
+// ═════════════════════════════ Babies & growth ═══════════════════════════════
 
 enum Sex {
   FEMALE
   MALE
-  UNKNOWN
+}
+
+enum CareStatus {
+  AT_HOME
+  IN_HOSPITAL // e.g. nursery admission
+  KANGAROO_CARE // preterm babies in the KMC unit until ~2.5 kg
 }
 
 model Baby {
-  id                  String    @id @default(uuid())
-  caregiverId         String
-  name                String
-  sex                 Sex       @default(UNKNOWN)
-  dateOfBirth         DateTime
-  birthWeightGrams    Int?
-  gestationalAgeWeeks Int?
-  birthHospital       String?
-  dischargeDate       DateTime?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
-  deletedAt           DateTime?
+  id                       String     @id @default(uuid())
+  caregiverId              String
+  givenName                String? // Optional: hospitals call babies "Baby <mother>" until 42 days
+  sex                      Sex? // required by the API (FR-BABY-01); null only on records created before v2
+  dateOfBirth              DateTime
+  gestationalAgeWeeks      Int? // at birth; < 37 = preterm. Required by the API; null only before v2
+  birthWeightGrams         Int? // required by the API; null only before v2
+  birthLengthCm            Decimal?   @db.Decimal(4, 1) // required by the API; null only before v2
+  birthHeadCircumferenceCm Decimal?   @db.Decimal(4, 1) // "HC" in the hospital booklet. Required by the API; null only before v2
+  birthFacilityId          String?
+  birthFacilityName        String? // free text when the facility is not in the directory
+  careStatus               CareStatus @default(AT_HOME)
+  dischargeDate            DateTime?
+  namePromptSentAt         DateTime? // day-42 "add your baby's name" prompt (job J5)
+  createdAt                DateTime   @default(now())
+  updatedAt                DateTime   @updatedAt
+  deletedAt                DateTime?
 
   caregiver     User           @relation(fields: [caregiverId], references: [id], onDelete: Cascade)
+  birthFacility Facility?      @relation(fields: [birthFacilityId], references: [id], onDelete: SetNull)
+  measurements  Measurement[]
   observations  Observation[]
+  rechecks      Recheck[]
+  voiceNotes    VoiceNote[]
   consultations Consultation[]
   drugCharts    DrugChart[]
+  referrals     Referral[]
 
   @@index([caregiverId])
+}
+
+enum MeasurementSource {
+  BIRTH
+  HOSPITAL
+  CLINIC
+  HOME
+}
+
+model Measurement {
+  id                  String            @id @default(uuid())
+  babyId              String
+  measuredAt          DateTime
+  weightGrams         Int?
+  lengthCm            Decimal?          @db.Decimal(4, 1)
+  headCircumferenceCm Decimal?          @db.Decimal(4, 1)
+  source              MeasurementSource
+  notes               String?
+  recordedById        String
+  createdAt           DateTime          @default(now())
+
+  baby Baby @relation(fields: [babyId], references: [id], onDelete: Cascade)
+
+  @@index([babyId, measuredAt])
+}
+
+// ═════════════════════════════ Checks & triage ═══════════════════════════════
+
+enum CheckType {
+  ROUTINE // scheduled wellbeing check
+  UNWELL // "my baby is unwell now"
+}
+
+enum Complaint {
+  FEVER
+  FEELS_COLD
+  CRYING_A_LOT
+  NOT_CRYING_OR_WEAK
+  NOT_FEEDING
+  BREATHING_PROBLEM
+  TWITCHING_OR_FITS
+  VOMITING
+  DIARRHEA
+  YELLOW_SKIN_OR_EYES
+  SKIN_COLOUR_CHANGE
+  CORD_PROBLEM
+  OTHER
 }
 
 enum RiskLevel {
@@ -114,6 +186,7 @@ enum SkinColor {
   YELLOW
   BLUE
   MOTTLED
+  FLUSHED
 }
 
 enum FeedingQuality {
@@ -135,6 +208,7 @@ enum CryDescription {
   WEAK
   HIGH_PITCHED
   INCONSOLABLE
+  NONE
 }
 
 enum ActivityLevel {
@@ -149,6 +223,13 @@ enum BreathingStatus {
   DIFFICULT
 }
 
+enum BreathingSound {
+  QUIET
+  WHEEZING
+  GRUNTING
+  NOISY
+}
+
 enum JaundiceLevel {
   NONE
   FACE_CHEST
@@ -161,6 +242,25 @@ enum CordStatus {
   SPREADING_REDNESS_OR_PUS
 }
 
+enum VomitingStatus {
+  NONE
+  SOMETIMES
+  REPEATED
+  FORCEFUL_OR_GREEN
+}
+
+enum RoomFeel {
+  COLD
+  COMFORTABLE
+  HOT
+}
+
+enum ClothingLevel {
+  LIGHT
+  NORMAL
+  HEAVY // many layers / wrapped in blankets
+}
+
 enum TemperatureSource {
   MANUAL
   BLE_THERMOMETER
@@ -171,8 +271,13 @@ model Observation {
   id              String            @id @default(uuid())
   babyId          String
   recordedById    String
+  checkType       CheckType         @default(ROUTINE)
+  complaints      Complaint[]
+  complaintText   String?
+  clientRef       String? // client-generated id; makes offline re-submission idempotent
+  recheckOfId     String? // set when this check answers a Recheck
   observedAt      DateTime          @default(now())
-  temperatureC    Decimal?          @db.Decimal(4, 1)
+  temperatureC    Decimal?          @db.Decimal(4, 1) // required by the API; null only on checks recorded before v2
   temperatureSrc  TemperatureSource @default(MANUAL)
   feedingCount24h Int?
   feedingQuality  FeedingQuality?
@@ -181,24 +286,86 @@ model Observation {
   cry             CryDescription?
   activity        ActivityLevel?
   breathing       BreathingStatus?
+  respiratoryRate Int? // breaths per minute, from the guided 60-second counter
+  chestIndrawing  Boolean?
+  breathingSound  BreathingSound?
   jaundice        JaundiceLevel?
   cordStatus      CordStatus?
-  convulsions     Boolean           @default(false)
+  vomiting        VomitingStatus?
+  roomFeel        RoomFeel?
+  clothing        ClothingLevel?
+  convulsions     Boolean?
   notes           String?
   photoKey        String?
+  voiceNoteId     String?           @unique
 
   // Output of the risk engine, stored for clinical continuity/audit.
   riskLevel     RiskLevel
-  riskReasons   Json
+  riskReasons   Json // { findings: [{code, level}], actions: [code] }
   riskEngineVer String
   createdAt     DateTime  @default(now())
 
-  baby Baby @relation(fields: [babyId], references: [id], onDelete: Cascade)
+  baby          Baby           @relation(fields: [babyId], references: [id], onDelete: Cascade)
+  voiceNote     VoiceNote?     @relation(fields: [voiceNoteId], references: [id], onDelete: SetNull)
+  recheckOf     Recheck?       @relation("RecheckAnswer", fields: [recheckOfId], references: [id], onDelete: SetNull)
+  rechecks      Recheck[]      @relation("RecheckSource")
+  consultations Consultation[]
 
+  @@unique([babyId, clientRef])
   @@index([babyId, observedAt])
 }
 
-// ───────────────────────────── Facilities & referral ─────────────────────────
+enum RecheckStatus {
+  PENDING
+  DONE
+  MISSED
+}
+
+/// A follow-up temperature check requested by the risk engine (e.g. 30 minutes after cooling steps).
+model Recheck {
+  id            String        @id @default(uuid())
+  babyId        String
+  observationId String
+  reason        String // finding code that triggered it, e.g. FEVER_MODERATE
+  dueAt         DateTime
+  status        RecheckStatus @default(PENDING)
+  notifiedAt    DateTime?
+  createdAt     DateTime      @default(now())
+
+  baby        Baby          @relation(fields: [babyId], references: [id], onDelete: Cascade)
+  observation Observation   @relation("RecheckSource", fields: [observationId], references: [id], onDelete: Cascade)
+  answers     Observation[] @relation("RecheckAnswer")
+
+  @@index([status, dueAt])
+}
+
+enum VoiceNoteStatus {
+  PENDING
+  TRANSCRIBED
+  FAILED
+  SKIPPED // no speech-to-text service configured
+}
+
+model VoiceNote {
+  id                 String          @id @default(uuid())
+  ownerId            String
+  babyId             String
+  storageKey         String
+  mimeType           String
+  sizeBytes          Int
+  status             VoiceNoteStatus @default(PENDING)
+  transcript         String?
+  language           String?
+  detectedComplaints Complaint[]
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  owner       User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  baby        Baby         @relation(fields: [babyId], references: [id], onDelete: Cascade)
+  observation Observation?
+}
+
+// ═════════════════════════════ Facilities & referral ═════════════════════════
 
 enum FacilityService {
   NEONATOLOGY
@@ -206,6 +373,7 @@ enum FacilityService {
   OPD
   MATERNITY
   EMERGENCY
+  KANGAROO_CARE
 }
 
 model Facility {
@@ -224,6 +392,8 @@ model Facility {
   updatedAt DateTime          @updatedAt
 
   departments FacilityDepartment[]
+  births      Baby[]
+  referrals   Referral[]
 
   @@index([latitude, longitude])
 }
@@ -240,7 +410,7 @@ model FacilityDepartment {
   @@unique([facilityId, service])
 }
 
-// ───────────────────────────── Clinicians ────────────────────────────────────
+// ═════════════════════════════ Clinicians ════════════════════════════════════
 
 enum VerificationStatus {
   PENDING_DOCUMENTS
@@ -256,14 +426,31 @@ enum ClinicianDocumentType {
   EMPLOYMENT_PROOF
 }
 
+enum PaymentProvider {
+  SANDBOX
+  MTN_MOMO
+  ORANGE_MONEY
+}
+
 model ClinicianProfile {
   id                 String             @id @default(uuid())
   userId             String             @unique
+  title              String             @default("Dr")
   licenseNumber      String             @unique
   specialties        String[]
   bio                String?
   currentFacility    String?
-  consultationFeeXaf Int
+  yearsExperience    Int?
+  photoKey           String? // required before verification: trust (meeting decision)
+  offersChat         Boolean            @default(true)
+  offersAudio        Boolean            @default(true)
+  offersVideo        Boolean            @default(true)
+  feeChatXaf         Int
+  feeAudioXaf        Int
+  feeVideoXaf        Int
+  availableNowUntil  DateTime? // "available now" for ASAP consultations
+  payoutProvider     PaymentProvider?
+  payoutPhone        String? // visible to admins only
   verificationStatus VerificationStatus @default(PENDING_DOCUMENTS)
   verificationNote   String?
   verifiedAt         DateTime?
@@ -277,6 +464,8 @@ model ClinicianProfile {
   documents     ClinicianDocument[]
   availability  ClinicianAvailability[]
   consultations Consultation[]
+  reviews       Review[]
+  payouts       Payout[]
 }
 
 model ClinicianDocument {
@@ -294,7 +483,7 @@ model ClinicianDocument {
   @@index([clinicianId, type])
 }
 
-/// Weekly recurring availability window, in the clinician's local time (Africa/Douala).
+/// Weekly recurring availability window, in local time (Africa/Douala, UTC+1).
 model ClinicianAvailability {
   id          String @id @default(uuid())
   clinicianId String
@@ -307,20 +496,28 @@ model ClinicianAvailability {
   @@index([clinicianId])
 }
 
-// ───────────────────────────── Teleconsultation & payments ───────────────────
+// ═════════════════════════════ Teleconsultation ══════════════════════════════
 
-enum ConsultationType {
+enum ConsultationMedium {
+  CHAT
   AUDIO
   VIDEO
-  CHAT
+}
+
+enum ConsultationTiming {
+  SCHEDULED
+  ASAP
 }
 
 enum ConsultationStatus {
-  REQUESTED
+  AWAITING_PAYMENT
+  REQUESTED // paid; waiting for the clinician to accept
   CONFIRMED
   IN_PROGRESS
   COMPLETED
   CANCELLED
+  DECLINED
+  EXPIRED
   NO_SHOW
 }
 
@@ -328,60 +525,166 @@ enum PaymentStatus {
   UNPAID
   PENDING
   PAID
-  FAILED
+  REFUND_PENDING
   REFUNDED
+  FAILED
 }
 
 model Consultation {
-  id               String             @id @default(uuid())
-  babyId           String
-  caregiverId      String
-  clinicianId      String
-  type             ConsultationType
-  status           ConsultationStatus @default(REQUESTED)
-  scheduledAt      DateTime
-  reason           String?
-  feeXaf           Int
-  commissionXaf    Int
-  paymentStatus    PaymentStatus      @default(UNPAID)
-  previsitSummary  Json?
-  recordingConsent Boolean            @default(false)
-  recordingKey     String?
-  clinicianNotes   String?
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
+  id                  String             @id @default(uuid())
+  babyId              String
+  caregiverId         String
+  clinicianId         String
+  observationId       String? // the check that led to this consultation
+  medium              ConsultationMedium
+  timing              ConsultationTiming @default(SCHEDULED)
+  status              ConsultationStatus @default(AWAITING_PAYMENT)
+  scheduledAt         DateTime
+  acceptDeadline      DateTime? // REQUESTED → EXPIRED after this (job J2)
+  reason              String?
+  preConsultChecklist Json? // e.g. fever steps already tried (meeting decision)
+  feeXaf              Int
+  commissionXaf       Int
+  clinicianEarningXaf Int
+  paymentStatus       PaymentStatus      @default(UNPAID)
+  previsitSummary     Json?
+  recordingConsent    Boolean            @default(false)
+  roomName            String?            @unique
+  reminderSentAt      DateTime?
+  startedAt           DateTime?
+  endedAt             DateTime?
+  clinicianNotes      String?
+  diagnosisSummary    String?
+  cancelledById       String?
+  cancelReason        String?
+  payoutId            String?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
 
-  baby      Baby             @relation(fields: [babyId], references: [id], onDelete: Cascade)
-  caregiver User             @relation("CaregiverConsultations", fields: [caregiverId], references: [id], onDelete: Cascade)
-  clinician ClinicianProfile @relation(fields: [clinicianId], references: [id])
-  payments  Payment[]
-  drugChart DrugChart?
+  baby        Baby             @relation(fields: [babyId], references: [id], onDelete: Cascade)
+  caregiver   User             @relation("CaregiverConsultations", fields: [caregiverId], references: [id], onDelete: Cascade)
+  clinician   ClinicianProfile @relation(fields: [clinicianId], references: [id])
+  observation Observation?     @relation(fields: [observationId], references: [id], onDelete: SetNull)
+  payout      Payout?          @relation(fields: [payoutId], references: [id], onDelete: SetNull)
+  payments    Payment[]
+  messages    Message[]
+  referral    Referral?
+  review      Review?
+  drugChart   DrugChart?
 
   @@index([clinicianId, scheduledAt])
   @@index([caregiverId])
+  @@index([status])
 }
 
-enum PaymentProvider {
-  MTN_MOMO
-  ORANGE_MONEY
+enum MessageKind {
+  TEXT
+  IMAGE
+  REPORT // the system-generated pre-visit summary that opens every chat
+  SYSTEM
+}
+
+model Message {
+  id             String      @id @default(uuid())
+  consultationId String
+  senderId       String? // null for SYSTEM / REPORT
+  kind           MessageKind
+  body           String?
+  attachmentKey  String?
+  contactMasked  Boolean     @default(false) // phone/email/link removed (anti-bypass, privacy)
+  readAt         DateTime?
+  createdAt      DateTime    @default(now())
+
+  consultation Consultation @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  sender       User?        @relation(fields: [senderId], references: [id], onDelete: SetNull)
+
+  @@index([consultationId, createdAt])
+}
+
+enum ReferralUrgency {
+  EMERGENCY
+  SAME_DAY
+  ROUTINE
+}
+
+model Referral {
+  id             String          @id @default(uuid())
+  consultationId String          @unique
+  babyId         String
+  facilityId     String?
+  facilityName   String
+  urgency        ReferralUrgency
+  reason         String
+  code           String          @unique // short code shown at the hospital, e.g. NW-7KQ2M
+  acknowledgedAt DateTime?
+  createdAt      DateTime        @default(now())
+
+  consultation Consultation @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  baby         Baby         @relation(fields: [babyId], references: [id], onDelete: Cascade)
+  facility     Facility?    @relation(fields: [facilityId], references: [id], onDelete: SetNull)
+}
+
+model Review {
+  id             String   @id @default(uuid())
+  consultationId String   @unique
+  caregiverId    String
+  clinicianId    String
+  rating         Int // 1–5
+  comment        String?
+  createdAt      DateTime @default(now())
+
+  consultation Consultation     @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  caregiver    User             @relation(fields: [caregiverId], references: [id], onDelete: Cascade)
+  clinician    ClinicianProfile @relation(fields: [clinicianId], references: [id], onDelete: Cascade)
+}
+
+// ═════════════════════════════ Payments & payouts ════════════════════════════
+
+enum PaymentKind {
+  COLLECTION
+  REFUND
 }
 
 model Payment {
   id             String          @id @default(uuid())
   consultationId String
+  kind           PaymentKind     @default(COLLECTION)
   provider       PaymentProvider
   payerPhone     String
   amountXaf      Int
   status         PaymentStatus   @default(PENDING)
   externalRef    String?         @unique
+  failureReason  String?
   rawResponse    Json?
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 
   consultation Consultation @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
 }
 
-// ───────────────────────────── Drug chart ────────────────────────────────────
+enum PayoutStatus {
+  PENDING
+  PAID
+}
+
+model Payout {
+  id          String       @id @default(uuid())
+  clinicianId String
+  periodStart DateTime
+  periodEnd   DateTime
+  amountXaf   Int
+  status      PayoutStatus @default(PENDING)
+  paidAt      DateTime?
+  reference   String?
+  createdAt   DateTime     @default(now())
+
+  clinician     ClinicianProfile @relation(fields: [clinicianId], references: [id])
+  consultations Consultation[]
+}
+
+// ═════════════════════════════ Drug chart ════════════════════════════════════
 
 model DrugChart {
   id             String   @id @default(uuid())
@@ -401,15 +704,101 @@ model DrugChartItem {
   drugChartId  String
   drugName     String
   dose         String // e.g. "2.5 ml"
-  route        String // e.g. "oral"
+  route        String // e.g. "oral", "eye drops"
   timesOfDay   String[] // "HH:mm", local time
   durationDays Int
   instructions String?
 
   drugChart DrugChart @relation(fields: [drugChartId], references: [id], onDelete: Cascade)
+  doseLogs  DoseLog[]
 }
 
-// ───────────────────────────── Audit ─────────────────────────────────────────
+enum DoseStatus {
+  GIVEN
+  SKIPPED
+}
+
+model DoseLog {
+  id           String     @id @default(uuid())
+  itemId       String
+  scheduledFor DateTime
+  status       DoseStatus
+  loggedAt     DateTime   @default(now())
+
+  item DrugChartItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([itemId, scheduledFor])
+}
+
+// ═════════════════════════════ Notifications ═════════════════════════════════
+
+model Device {
+  id            String   @id @default(uuid())
+  userId        String
+  expoPushToken String   @unique
+  platform      String // android | ios | web
+  lastSeenAt    DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String    @id @default(uuid())
+  userId    String
+  type      String // e.g. CONSULT_CONFIRMED, RECHECK_DUE, NEW_MESSAGE
+  title     String
+  body      String
+  data      Json?
+  readAt    DateTime?
+  pushedAt  DateTime?
+  smsAt     DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+// ═════════════════════════════ Platform ══════════════════════════════════════
+
+enum JobStatus {
+  QUEUED
+  RUNNING
+  DONE
+  FAILED
+}
+
+/// Postgres-backed work queue (see docs/05-background-processes-specification.md).
+model Job {
+  id          String    @id @default(uuid())
+  queue       String
+  payload     Json
+  status      JobStatus @default(QUEUED)
+  runAt       DateTime  @default(now())
+  attempts    Int       @default(0)
+  maxAttempts Int       @default(5)
+  lastError   String?
+  lockedAt    DateTime?
+  finishedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([status, runAt])
+}
+
+/// Every inbound webhook, stored before processing: idempotency + audit.
+model WebhookEvent {
+  id             String    @id @default(uuid())
+  source         String // e.g. payments:SANDBOX, livekit
+  externalId     String
+  signatureValid Boolean
+  payload        Json
+  processedAt    DateTime?
+  error          String?
+  createdAt      DateTime  @default(now())
+
+  @@unique([source, externalId])
+}
 
 model AuditLog {
   id         String   @id @default(uuid())

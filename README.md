@@ -1,122 +1,90 @@
 # NeoWell — Backend API
 
-NeoWell helps mothers and caregivers in Cameroon watch their newborn at home. Caregivers record a guided daily check. The app spots danger signs early and gives an instant **Green / Yellow / Red** result. It then points the family to the nearest suitable facility, or lets them book a paid teleconsultation with a verified paediatric or neonatal clinician. The clinician gets a pre-visit summary before the call.
+NeoWell helps mothers and caregivers in Cameroon monitor their newborn at home. This API serves the NeoWell mobile app ([`Cheneba/neowell-app`](https://github.com/Cheneba/neowell-app)). It covers:
+- **Routine checks.** Guided checks scored instantly as 🟢 Green / 🟡 Yellow / 🔴 Red with safe advice.
+- **"My baby is unwell now" checks.** Follow-up questions specific to the complaint.
+- **Growth tracking.** Against the WHO standards.
+- **Nearest facilities** for referral.
+- **Paid teleconsultations** with verified clinicians by chat, audio or video, paid with MTN MoMo or Orange Money.
 
-This repository holds the API. It is built with **NestJS 11 + TypeScript**, **PostgreSQL** and **Prisma 7**.
+Built with **NestJS 11 + TypeScript**, **PostgreSQL 16** and **Prisma 7**.
 
----
+## 📚 Design documents
+
+All design documents are in [`docs/`](docs/README.md):
+
+| # | Document |
+|---|---|
+| 01 | [Requirements Specification](docs/01-requirements-specification.md), including the triage rules (§6) and the decisions from the product meeting |
+| 02 | [Database Schema Specification](docs/02-database-schema-specification.md) |
+| 03 | [Database Diagram (Excalidraw)](docs/03-database-diagram.excalidraw), with an [SVG preview](docs/03-database-diagram.svg) |
+| 04 | [API Endpoint Specification](docs/04-api-endpoint-specification.md) |
+| 05 | [Background Processes Specification](docs/05-background-processes-specification.md) |
+| 06 | [Technology Stack and Assets](docs/06-technology-stack-and-assets.md) |
+| 07 | [Front-End Design Guide v1.0](docs/07-frontend-design-guide-v1.0.md) |
 
 ## Quick start
 
 ```bash
-# 1. Start PostgreSQL (or point DATABASE_URL at your own instance)
-docker compose up -d
-
-# 2. Install dependencies (also generates the Prisma client)
+docker compose up -d                    # PostgreSQL
 cp .env.example .env
-npm install
-
-# 3. Create the schema, and optionally seed an admin + a demo facility
-npm run db:deploy
-SEED_ADMIN_PHONE=+2376XXXXXXXX npm run db:seed
-
-# 4. Run
+npm install                             # also generates the Prisma client
+npm run db:deploy                       # apply migrations
+SEED_ADMIN_PHONE=+2376XXXXXXXX SEED_DEMO_CLINICIAN_PHONE=+2376YYYYYYYY npm run db:seed
 npm run start:dev
 ```
 
-- API: http://localhost:3000
-- Interactive API docs (Swagger): http://localhost:3000/docs (disabled in production)
-- Health check: `GET /health`
-
-With `SMS_PROVIDER=console`, sign-in codes are **printed in the server log** instead of being sent by SMS.
-
-### Scripts
+- **API:** http://localhost:3000
+- **Swagger:** http://localhost:3000/docs (outside production)
+- **Health:** `GET /health`
+- **Sign-in codes:** printed in the server log while `SMS_PROVIDER=console`.
+- **Payments:** the `SANDBOX` provider confirms automatically after about 3 seconds. Payer numbers ending in `000` fail.
+- **Demo doctor:** `SEED_DEMO_CLINICIAN_PHONE` creates a verified doctor who is "available now", so you can try a consultation end to end.
+- **Calls:** need `LIVEKIT_*`.
+- **Voice notes:** transcribed when `STT_URL` points to a self-hosted Whisper server. See [doc 06](docs/06-technology-stack-and-assets.md).
 
 | Command | What it does |
 | --- | --- |
-| `npm run start:dev` | Run with hot reload |
-| `npm run build` / `npm run start:prod` | Compile to `dist/` / run the compiled app |
-| `npm test` | Unit tests (triage engine, schedule, geo, scheduling) |
-| `npm run test:e2e` | End-to-end API tests. Needs a migrated database in `DATABASE_URL` |
+| `npm run start:dev` | Run with hot reload (includes background jobs) |
+| `npm test` | Unit tests: triage engine, WHO growth, naming rule, question bank, scheduling, contact masking, transitions |
+| `npm run test:e2e` | End-to-end API tests against the database in `DATABASE_URL` (migrated) |
 | `npm run lint` / `npm run typecheck` / `npm run format` | Code quality |
-| `npm run db:migrate` | Create and apply a new migration after editing `prisma/schema.prisma` |
-| `npm run db:deploy` | Apply pending migrations (CI / production) |
-
----
+| `npm run db:migrate` | Create a migration after editing `prisma/schema.prisma`, then regenerate docs 02/03 (`python3 scripts/docs/gen_schema_doc.py && python3 scripts/docs/gen_diagram.py`) |
 
 ## Architecture
 
 ```
 src/
-├── auth/            Phone + OTP sign-in, JWT access tokens, rotating refresh tokens
-├── users/           /me profile, locale and explicit consents
-├── babies/          Baby profiles and the per-age check schedule
-├── observations/    Daily wellbeing checks → risk assessment
-├── triage/          ★ Rule-based risk engine + check schedule (pure, fully unit-tested)
-├── reports/         3-day / 7-day clinician summary
-├── facilities/      Facility directory and nearest-facility search
-├── clinicians/      Clinician registration, document upload, availability, admin review
-├── consultations/   Teleconsultation booking and status workflow
-├── storage/         Private file storage (local disk now; S3/GCS later)
-├── notifications/   SMS gateway abstraction (console driver now)
-├── common/          Auth guards, role decorators, audit interceptor
-└── prisma/          Database client
-prisma/schema.prisma The full data model
+├── auth/            Phone + OTP sign-in, JWT, rotating refresh tokens
+├── users/           Profile (first/last name), consents, data export, account deletion
+├── babies/          Baby profiles, 42-day naming rule, risk factors, KMC/hospital pause (baby-facts.ts)
+├── growth/          Measurements + WHO growth z-scores (who-lms.json)
+├── checks/          Question bank, routine & unwell check plans, observations, rechecks
+├── triage/          ★ Risk engine v0.2 + check schedule (pure, unit-tested)
+├── voice/           Voice notes → self-hosted speech-to-text → complaint keywords
+├── reports/         3/7-day summary (JSON + PDF)
+├── facilities/      Directory, search, nearest facilities
+├── clinicians/      Profiles, fees per medium, documents, photo, availability, slots, earnings
+├── consultations/   Booking, payments, lifecycle, chat (contact masking), calls (LiveKit), referral,
+│                    drug chart, review, payment & LiveKit webhooks
+├── drug-charts/     Caregiver medicines and dose logs
+├── payments/        Payment gateway interface + sandbox provider
+├── notifications/   Inbox, devices, Expo push, SMS fallback, bilingual templates
+├── jobs/            Postgres job queue (SKIP LOCKED)
+├── scheduler/       Cron jobs J1–J10 and maintenance (retention, purge, payouts…)
+├── admin/           Clinician review, users, payouts, stats, failed jobs
+├── files/, storage/ Private storage + expiring signed file links
+└── common/, config/, prisma/, health/
 ```
 
-Cross-cutting behaviour:
-- **Auth by default.** Every route needs a bearer token unless it is marked `@Public()`. `@Roles(...)` restricts a route to `CAREGIVER`, `CLINICIAN` or `ADMIN`.
-- **Validation.** Every request body is validated. Unknown fields are rejected.
-- **Audit log.** Every successful write is logged with user, route, entity, status and IP. Request bodies are not logged because they can contain health data (PDR §5).
-- **Rate limiting.** 120 requests/min in general, 10/min on the auth routes. Separately, there is a per-phone OTP cooldown and an hourly cap on codes.
-- **Consent gates.** Recording checks requires data-collection consent. Booking a clinician requires consent to share data with clinicians. Recording a call requires recording consent.
+## Status
 
-## API overview
+**Built in v2:** everything in the requirements marked M or S. The details are in the specs.
 
-| Area | Endpoints |
-| --- | --- |
-| Auth | `POST /auth/otp/request`, `POST /auth/otp/verify`, `POST /auth/refresh`, `POST /auth/logout` |
-| Me | `GET /me`, `PATCH /me`, `PUT /me/consents` |
-| Babies | `POST/GET /babies`, `GET/PATCH/DELETE /babies/:id`, `GET /babies/:id/check-schedule` |
-| Checks | `POST/GET /babies/:babyId/observations` |
-| Reports | `GET /babies/:babyId/summary?days=3\|7` |
-| Facilities | `GET /facilities/nearby?lat=&lon=&radiusKm=&service=`, `GET /facilities/:id`, `POST /facilities` (admin) |
-| Clinicians | `GET /clinicians`, `GET /clinicians/:id`, `POST/GET/PATCH /clinicians/me`, `POST /clinicians/me/documents`, `PUT /clinicians/me/availability` |
-| Admin | `GET /clinicians/review-queue`, `POST /clinicians/:id/review` |
-| Consultations | `POST/GET /consultations`, `GET /consultations/:id`, `PATCH /consultations/:id/status` |
-
-Full request and response schemas are in Swagger at `/docs`.
-
-## Triage rules (v0.1.0)
-
-The engine is in `src/triage/risk-engine.ts`. It is deliberately **conservative**: when in doubt, it recommends care (PDR §12). Thresholds are in `DEFAULT_RISK_CONFIG`. Each stored check records the engine version that scored it.
-
-| Result | Triggers |
-| --- | --- |
-| 🔴 **RED — seek care now** | Temperature ≥ 38.0 °C or < 36.0 °C · convulsions · unable to feed · lethargic · fast or difficult breathing · blue skin · spreading cord redness or pus · bloody stool · high-pitched cry · jaundice on palms/soles, or any jaundice before 24 h · **3 or more Yellow findings together** · **any Yellow finding in a preterm (< 37 wk) or low-birth-weight (< 2.5 kg) baby in the first week** |
-| 🟡 **YELLOW — monitor** | 37.5–37.9 °C · 36.0–36.4 °C · reduced feeding or < 8 feeds/24 h · reduced activity · weak or inconsolable cry · pale or mottled skin · jaundice on face/chest · local cord redness or discharge · diarrhoea, reduced stool or no stool |
-| 🟢 **GREEN** | None of the above |
-
-Results are returned as stable codes (`FEVER`, `SEEK_CARE_NOW`, …) so the mobile app can show localized text and icons in English, French and local languages. RED responses include the emergency numbers set in `EMERGENCY_PHONE_NUMBERS`.
-
-Check schedule by age: **3 checks/day** under 1 week, **2/day** from 1 week to 3 months, **1/day** after that.
-
-> ⚠️ **Clinical sign-off required.** These rules and thresholds are a starting point based on common newborn danger signs. The partner neonatology team must review and approve them before any real use. Change the rules only together with tests, and bump `RISK_ENGINE_VERSION` each time.
-
-## Roadmap
-
-**Done in this first iteration:** accounts with phone OTP · baby profiles · daily checks with instant triage · age-based check schedule · 3-day/7-day summaries · facility directory with nearest-facility search · clinician registration with the three required documents and admin verification · clinician availability · teleconsultation booking with a pre-visit summary snapshot, commission split and double-booking protection · consents · audit log · CI.
-
-**Next (MVP):**
-- [ ] Real SMS gateway for OTPs and alerts, plus SMS fallback (PDR §12)
-- [ ] MTN MoMo / Orange Money payments: `Payment` model is ready; needs gateway integration and webhooks
-- [ ] Teleconsultation calls: WebRTC provider tokens and chat/file sharing
-- [ ] Drug chart API: `DrugChart`/`DrugChartItem` models are ready; needs a clinician prescribing endpoint and a dose reminder calendar
-- [ ] Push notifications and reminder scheduler for checks, immunisations and follow-ups
-- [ ] PDF export of the clinician summary
-- [ ] Neo AI assistant (rule-based tips + small language model) and voice input for mothers with low literacy
-- [ ] Data export and deletion endpoints, and a retention job (PDR §9)
-- [ ] S3/GCS storage with server-side encryption, and signed URLs for admins to view documents
-- [ ] Verified facility dataset for Cameroon (the seed contains only one clearly fake demo facility)
-
-**Near-term:** BLE thermometer input (`TemperatureSource.BLE_THERMOMETER` exists) · offline sync with idempotent uploads · clinician triage inbox · travel-time facility ranking · ratings.
+**Waiting on external input:**
+- **Clinical sign-off** of the triage rules and advice text. Open questions are in [requirements §6.5](docs/01-requirements-specification.md).
+- **The product owner's disease spreadsheet**, which feeds the knowledge base (FR-KB).
+- **A live payment aggregator account.** The sandbox works today; the live adapter plugs into `PaymentGateway`.
+- **SMS gateway, LiveKit and speech-to-text server credentials.**
+- **A verified facility dataset for Cameroon.**
+- **The correct emergency numbers** in `EMERGENCY_PHONE_NUMBERS`.

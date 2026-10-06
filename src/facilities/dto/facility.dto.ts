@@ -14,6 +14,8 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
+import { PartialType } from '@nestjs/swagger';
+import { IsBoolean, IsInt } from 'class-validator';
 import { FacilityService } from '../../generated/prisma/enums';
 
 const PHONE = /^\+?[0-9 ]{6,20}$/;
@@ -83,4 +85,24 @@ export class CreateFacilityDto {
   @ValidateNested({ each: true })
   @Type(() => DepartmentDto)
   departments?: DepartmentDto[];
+}
+
+export class UpdateFacilityDto extends PartialType(CreateFacilityDto) {
+  @IsOptional()
+  @IsBoolean()
+  isActive?: boolean;
+}
+
+export class SearchFacilitiesQuery {
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  q?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(50)
+  limit?: number;
 }

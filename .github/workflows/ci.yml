@@ -25,6 +25,10 @@ jobs:
       DATABASE_URL: postgresql://neowell:neowell@localhost:5432/neowell_test
       JWT_ACCESS_SECRET: ci-access-secret-0123456789abcdef0123456789
       OTP_SECRET: ci-otp-secret-0123456789abcdef0123456789abcd
+      FILE_URL_SECRET: ci-file-url-secret-0123456789abcdef01234567
+      PAYMENTS_WEBHOOK_SECRET: ci-payments-secret-0123456789abcdef0123456
+      JOBS_ENABLED: 'false'
+      PUSH_DRIVER: log
       STORAGE_LOCAL_DIR: /tmp/neowell-uploads
     steps:
       - uses: actions/checkout@v4
