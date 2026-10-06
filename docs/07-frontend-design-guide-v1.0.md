@@ -148,14 +148,14 @@ Root (Stack, guards in src/app/_layout.tsx)
 │   ├── result · facilities
 │   ├── doctors/[id] · doctors/[id]/book
 │   └── consultation/[id] · consultation/[id]/pay · consultation/[id]/review
-└── (clinician)            role = CLINICIAN
+└── clinic                 role = CLINICIAN (a real path segment, so caregiver and clinician screens never share a URL)
     ├── setup              register profile (until profile exists)
     ├── (tabs)             Consultations · Earnings · Me
     ├── documents · availability
     └── consultation/[id] · consultation/[id]/refer · consultation/[id]/prescribe · consultation/[id]/patient
 ```
 
-Guards: `Stack.Protected` with `guard` = signed out / needs profile / needs consent / caregiver / clinician. Deep links from notifications use `data.url` (e.g. `/consultation/abc`).
+Guards: `Stack.Protected` with `guard` = signed out / needs profile / needs consent / caregiver / clinician. Deep links from notifications use `data.url` (e.g. `/consultation/abc`); for clinicians the app prefixes `/clinic`.
 
 ## 6. Screens
 
@@ -239,7 +239,7 @@ neowell-app/
 ├── src/
 │   ├── app/                 Routes only (Expo Router); thin screens that compose features
 │   │   ├── _layout.tsx      fonts, providers, guards
-│   │   ├── (auth)/ onboarding/ (caregiver)/ (clinician)/
+│   │   ├── (auth)/ onboarding/ (caregiver)/ clinic/
 │   ├── api/                 client.ts (fetch + refresh), types.ts (API shapes)
 │   ├── components/          UI kit (§4); no API calls here
 │   ├── features/            Domain logic + feature components
