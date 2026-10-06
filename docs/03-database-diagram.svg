@@ -1,0 +1,1058 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2882" height="2146" viewBox="-10 -10 2892 2156" font-family="Helvetica, Arial, sans-serif">
+<defs><marker id="tri" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5E6E82"/></marker></defs>
+<rect x="-10" y="-10" width="2892" height="2156" fill="#fff"/>
+<rect x="0" y="0" width="748" height="457" rx="18" fill="#EAF3FD" stroke="#62A6EA" stroke-dasharray="8 6"/>
+<text x="24" y="30" font-size="20" font-weight="bold" fill="#2C6CB5">Identity &amp; access</text>
+<rect x="828" y="0" width="748" height="447" rx="18" fill="#FDEEF2" stroke="#F0849F" stroke-dasharray="8 6"/>
+<text x="852" y="30" font-size="20" font-weight="bold" fill="#C2446A">Babies &amp; growth</text>
+<rect x="1656" y="0" width="748" height="552" rx="18" fill="#EAF3FD" stroke="#62A6EA" stroke-dasharray="8 6"/>
+<text x="1680" y="30" font-size="20" font-weight="bold" fill="#2C6CB5">Facilities &amp; referral</text>
+<rect x="0" y="632" width="748" height="770" rx="18" fill="#FDEEF2" stroke="#F0849F" stroke-dasharray="8 6"/>
+<text x="24" y="662" font-size="20" font-weight="bold" fill="#C2446A">Checks &amp; triage</text>
+<rect x="828" y="632" width="748" height="618" rx="18" fill="#EAF3FD" stroke="#62A6EA" stroke-dasharray="8 6"/>
+<text x="852" y="662" font-size="20" font-weight="bold" fill="#2C6CB5">Clinicians</text>
+<rect x="1656" y="632" width="748" height="675" rx="18" fill="#FDEEF2" stroke="#F0849F" stroke-dasharray="8 6"/>
+<text x="1680" y="662" font-size="20" font-weight="bold" fill="#C2446A">Teleconsultation</text>
+<rect x="0" y="1482" width="748" height="352" rx="18" fill="#EAF3FD" stroke="#62A6EA" stroke-dasharray="8 6"/>
+<text x="24" y="1512" font-size="20" font-weight="bold" fill="#2C6CB5">Payments &amp; payouts</text>
+<rect x="828" y="1482" width="748" height="476" rx="18" fill="#FDEEF2" stroke="#F0849F" stroke-dasharray="8 6"/>
+<text x="852" y="1512" font-size="20" font-weight="bold" fill="#C2446A">Drug chart</text>
+<rect x="1656" y="1482" width="378" height="514" rx="18" fill="#EAF3FD" stroke="#62A6EA" stroke-dasharray="8 6"/>
+<text x="1680" y="1512" font-size="20" font-weight="bold" fill="#2C6CB5">Notifications</text>
+<rect x="2114" y="1482" width="748" height="514" rx="18" fill="#FDEEF2" stroke="#F0849F" stroke-dasharray="8 6"/>
+<text x="2138" y="1512" font-size="20" font-weight="bold" fill="#C2446A">Platform</text>
+<line x1="414" y1="263" x2="354" y2="348.0" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="852" y1="62.0" x2="354" y2="233.5" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="1182" y1="62.0" x2="1680" y2="233.5" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="1222" y1="62.0" x2="1182" y2="167.0" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="1845.0" y1="377" x2="1845.0" y2="347" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="2070" y1="290" x2="1990" y2="676" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="2050" y1="62.0" x2="1182" y2="167.0" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="2050" y1="62.0" x2="2010" y2="167.0" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="354" y1="694.0" x2="852" y2="413" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="354" y1="932.0" x2="394" y2="1027.0" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="354" y1="694.0" x2="414" y2="884" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="704" y1="676" x2="872" y2="423" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="394" y1="694.0" x2="354" y2="780.0" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="414" y1="914" x2="334" y2="404" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="704" y1="914" x2="872" y2="423" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="852" y1="694.0" x2="354" y2="394" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="1222" y1="694.0" x2="1182" y2="780.0" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="1242" y1="914" x2="1182" y2="989.5" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="1680" y1="694.0" x2="1182" y2="413" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="1680" y1="694.0" x2="354" y2="394" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="1680" y1="694.0" x2="1182" y2="979.5" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="1680" y1="694.0" x2="354" y2="979.5" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="1680" y1="1273" x2="724" y2="1544.0" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="2050" y1="694.0" x2="2010" y2="789.5" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="2050" y1="694.0" x2="354" y2="394" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="2070" y1="933" x2="2010" y2="1027.5" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="2050" y1="951.0" x2="354" y2="394" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="2050" y1="951.0" x2="1182" y2="1027.5" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="354" y1="1544.0" x2="1680" y2="1273" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="704" y1="1526" x2="852" y2="1216" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="1017.0" y1="1526" x2="1017.0" y2="423" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="1162" y1="1526" x2="1680" y2="1273" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="1017.0" y1="1726" x2="1017.0" y2="1696" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="1222" y1="1667" x2="1182" y2="1744.0" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="1700" y1="1526" x2="354" y2="394" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="1700" y1="1726" x2="354" y2="394" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<line x1="2528" y1="1764" x2="354" y2="394" stroke="#5E6E82" stroke-width="1.5" marker-end="url(#tri)" opacity="0.8"/>
+<rect x="24" y="44" width="330" height="360" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M24,80 V54 a10,10 0 0 1 10,-10 H344 a10,10 0 0 1 10,10 V80 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="189.0" y="68" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">User</text>
+<text x="34" y="104" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="62" y="104" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="344" y="104" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="34" y="123" font-size="11" font-weight="bold" fill="#5E6E82">UQ</text>
+<text x="62" y="123" font-size="12.5" fill="#1E2B3C">phone</text>
+<text x="344" y="123" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="34" y="142" font-size="11" font-weight="bold" fill="#5E6E82">UQ</text>
+<text x="62" y="142" font-size="12.5" fill="#1E2B3C">email</text>
+<text x="344" y="142" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="34" y="161" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="161" font-size="12.5" fill="#1E2B3C">firstName</text>
+<text x="344" y="161" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="34" y="180" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="180" font-size="12.5" fill="#1E2B3C">lastName</text>
+<text x="344" y="180" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="34" y="199" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="199" font-size="12.5" fill="#1E2B3C">role</text>
+<text x="344" y="199" font-size="12" fill="#5E6E82" text-anchor="end">Role</text>
+<text x="34" y="218" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="218" font-size="12.5" fill="#1E2B3C">locale</text>
+<text x="344" y="218" font-size="12" fill="#5E6E82" text-anchor="end">Locale</text>
+<text x="34" y="237" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="237" font-size="12.5" fill="#1E2B3C">region</text>
+<text x="344" y="237" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="34" y="256" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="256" font-size="12.5" fill="#1E2B3C">city</text>
+<text x="344" y="256" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="34" y="275" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="275" font-size="12.5" fill="#1E2B3C">isActive</text>
+<text x="344" y="275" font-size="12" fill="#5E6E82" text-anchor="end">Boolean</text>
+<text x="34" y="294" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="294" font-size="12.5" fill="#1E2B3C">consentDataCollectionAt</text>
+<text x="344" y="294" font-size="12" fill="#5E6E82" text-anchor="end">DateTime?</text>
+<text x="34" y="313" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="313" font-size="12.5" fill="#1E2B3C">consentClinicianShareAt</text>
+<text x="344" y="313" font-size="12" fill="#5E6E82" text-anchor="end">DateTime?</text>
+<text x="34" y="332" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="332" font-size="12.5" fill="#1E2B3C">consentRecordingAt</text>
+<text x="344" y="332" font-size="12" fill="#5E6E82" text-anchor="end">DateTime?</text>
+<text x="34" y="351" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="351" font-size="12.5" fill="#1E2B3C">deletionRequestedAt</text>
+<text x="344" y="351" font-size="12" fill="#5E6E82" text-anchor="end">DateTime?</text>
+<text x="34" y="370" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="370" font-size="12.5" fill="#1E2B3C">createdAt</text>
+<text x="344" y="370" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<text x="34" y="389" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="389" font-size="12.5" fill="#1E2B3C">updatedAt</text>
+<text x="344" y="389" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<rect x="394" y="44" width="330" height="189" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M394,80 V54 a10,10 0 0 1 10,-10 H714 a10,10 0 0 1 10,10 V80 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="559.0" y="68" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">OtpCode</text>
+<text x="404" y="104" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="432" y="104" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="714" y="104" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="404" y="123" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="123" font-size="12.5" fill="#1E2B3C">phone</text>
+<text x="714" y="123" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="404" y="142" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="142" font-size="12.5" fill="#1E2B3C">codeHash</text>
+<text x="714" y="142" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="404" y="161" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="161" font-size="12.5" fill="#1E2B3C">expiresAt</text>
+<text x="714" y="161" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<text x="404" y="180" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="180" font-size="12.5" fill="#1E2B3C">attempts</text>
+<text x="714" y="180" font-size="12" fill="#5E6E82" text-anchor="end">Int</text>
+<text x="404" y="199" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="199" font-size="12.5" fill="#1E2B3C">consumedAt</text>
+<text x="714" y="199" font-size="12" fill="#5E6E82" text-anchor="end">DateTime?</text>
+<text x="404" y="218" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="218" font-size="12.5" fill="#1E2B3C">createdAt</text>
+<text x="714" y="218" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<rect x="394" y="263" width="330" height="170" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M394,299 V273 a10,10 0 0 1 10,-10 H714 a10,10 0 0 1 10,10 V299 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="559.0" y="287" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">RefreshToken</text>
+<text x="404" y="323" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="432" y="323" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="714" y="323" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="404" y="342" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="432" y="342" font-size="12.5" fill="#1E2B3C">userId</text>
+<text x="714" y="342" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="404" y="361" font-size="11" font-weight="bold" fill="#5E6E82">UQ</text>
+<text x="432" y="361" font-size="12.5" fill="#1E2B3C">tokenHash</text>
+<text x="714" y="361" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="404" y="380" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="380" font-size="12.5" fill="#1E2B3C">expiresAt</text>
+<text x="714" y="380" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<text x="404" y="399" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="399" font-size="12.5" fill="#1E2B3C">revokedAt</text>
+<text x="714" y="399" font-size="12" fill="#5E6E82" text-anchor="end">DateTime?</text>
+<text x="404" y="418" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="418" font-size="12.5" fill="#1E2B3C">createdAt</text>
+<text x="714" y="418" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<rect x="852" y="44" width="330" height="379" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M852,80 V54 a10,10 0 0 1 10,-10 H1172 a10,10 0 0 1 10,10 V80 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="1017.0" y="68" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">Baby</text>
+<text x="862" y="104" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="890" y="104" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="1172" y="104" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="862" y="123" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="890" y="123" font-size="12.5" fill="#1E2B3C">caregiverId</text>
+<text x="1172" y="123" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="862" y="142" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="142" font-size="12.5" fill="#1E2B3C">givenName</text>
+<text x="1172" y="142" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="862" y="161" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="161" font-size="12.5" fill="#1E2B3C">sex</text>
+<text x="1172" y="161" font-size="12" fill="#5E6E82" text-anchor="end">Sex</text>
+<text x="862" y="180" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="180" font-size="12.5" fill="#1E2B3C">dateOfBirth</text>
+<text x="1172" y="180" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<text x="862" y="199" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="199" font-size="12.5" fill="#1E2B3C">gestationalAgeWeeks</text>
+<text x="1172" y="199" font-size="12" fill="#5E6E82" text-anchor="end">Int</text>
+<text x="862" y="218" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="218" font-size="12.5" fill="#1E2B3C">birthWeightGrams</text>
+<text x="1172" y="218" font-size="12" fill="#5E6E82" text-anchor="end">Int</text>
+<text x="862" y="237" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="237" font-size="12.5" fill="#1E2B3C">birthLengthCm</text>
+<text x="1172" y="237" font-size="12" fill="#5E6E82" text-anchor="end">Decimal</text>
+<text x="862" y="256" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="256" font-size="12.5" fill="#1E2B3C">birthHeadCircumferenceCm</text>
+<text x="1172" y="256" font-size="12" fill="#5E6E82" text-anchor="end">Decimal</text>
+<text x="862" y="275" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="890" y="275" font-size="12.5" fill="#1E2B3C">birthFacilityId</text>
+<text x="1172" y="275" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="862" y="294" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="294" font-size="12.5" fill="#1E2B3C">birthFacilityName</text>
+<text x="1172" y="294" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="862" y="313" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="313" font-size="12.5" fill="#1E2B3C">careStatus</text>
+<text x="1172" y="313" font-size="12" fill="#5E6E82" text-anchor="end">CareStatus</text>
+<text x="862" y="332" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="332" font-size="12.5" fill="#1E2B3C">dischargeDate</text>
+<text x="1172" y="332" font-size="12" fill="#5E6E82" text-anchor="end">DateTime?</text>
+<text x="862" y="351" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="351" font-size="12.5" fill="#1E2B3C">namePromptSentAt</text>
+<text x="1172" y="351" font-size="12" fill="#5E6E82" text-anchor="end">DateTime?</text>
+<text x="862" y="370" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="370" font-size="12.5" fill="#1E2B3C">createdAt</text>
+<text x="1172" y="370" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<text x="862" y="389" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="389" font-size="12.5" fill="#1E2B3C">updatedAt</text>
+<text x="1172" y="389" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<text x="862" y="408" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="408" font-size="12.5" fill="#1E2B3C">deletedAt</text>
+<text x="1172" y="408" font-size="12" fill="#5E6E82" text-anchor="end">DateTime?</text>
+<rect x="1222" y="44" width="330" height="246" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M1222,80 V54 a10,10 0 0 1 10,-10 H1542 a10,10 0 0 1 10,10 V80 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="1387.0" y="68" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">Measurement</text>
+<text x="1232" y="104" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="1260" y="104" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="1542" y="104" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1232" y="123" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="1260" y="123" font-size="12.5" fill="#1E2B3C">babyId</text>
+<text x="1542" y="123" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1232" y="142" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1260" y="142" font-size="12.5" fill="#1E2B3C">measuredAt</text>
+<text x="1542" y="142" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<text x="1232" y="161" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1260" y="161" font-size="12.5" fill="#1E2B3C">weightGrams</text>
+<text x="1542" y="161" font-size="12" fill="#5E6E82" text-anchor="end">Int?</text>
+<text x="1232" y="180" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1260" y="180" font-size="12.5" fill="#1E2B3C">lengthCm</text>
+<text x="1542" y="180" font-size="12" fill="#5E6E82" text-anchor="end">Decimal?</text>
+<text x="1232" y="199" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1260" y="199" font-size="12.5" fill="#1E2B3C">headCircumferenceCm</text>
+<text x="1542" y="199" font-size="12" fill="#5E6E82" text-anchor="end">Decimal?</text>
+<text x="1232" y="218" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1260" y="218" font-size="12.5" fill="#1E2B3C">source</text>
+<text x="1542" y="218" font-size="12" fill="#5E6E82" text-anchor="end">MeasurementSource</text>
+<text x="1232" y="237" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1260" y="237" font-size="12.5" fill="#1E2B3C">notes</text>
+<text x="1542" y="237" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="1232" y="256" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1260" y="256" font-size="12.5" fill="#1E2B3C">recordedById</text>
+<text x="1542" y="256" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1232" y="275" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1260" y="275" font-size="12.5" fill="#1E2B3C">createdAt</text>
+<text x="1542" y="275" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<rect x="1680" y="44" width="330" height="303" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M1680,80 V54 a10,10 0 0 1 10,-10 H2000 a10,10 0 0 1 10,10 V80 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="1845.0" y="68" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">Facility</text>
+<text x="1690" y="104" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="1718" y="104" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="2000" y="104" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1690" y="123" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="123" font-size="12.5" fill="#1E2B3C">name</text>
+<text x="2000" y="123" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1690" y="142" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="142" font-size="12.5" fill="#1E2B3C">region</text>
+<text x="2000" y="142" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="1690" y="161" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="161" font-size="12.5" fill="#1E2B3C">city</text>
+<text x="2000" y="161" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="1690" y="180" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="180" font-size="12.5" fill="#1E2B3C">address</text>
+<text x="2000" y="180" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="1690" y="199" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="199" font-size="12.5" fill="#1E2B3C">latitude</text>
+<text x="2000" y="199" font-size="12" fill="#5E6E82" text-anchor="end">Float</text>
+<text x="1690" y="218" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="218" font-size="12.5" fill="#1E2B3C">longitude</text>
+<text x="2000" y="218" font-size="12" fill="#5E6E82" text-anchor="end">Float</text>
+<text x="1690" y="237" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="237" font-size="12.5" fill="#1E2B3C">services</text>
+<text x="2000" y="237" font-size="12" fill="#5E6E82" text-anchor="end">FacilityService[]</text>
+<text x="1690" y="256" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="256" font-size="12.5" fill="#1E2B3C">mainPhone</text>
+<text x="2000" y="256" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="1690" y="275" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="275" font-size="12.5" fill="#1E2B3C">hours</text>
+<text x="2000" y="275" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="1690" y="294" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="294" font-size="12.5" fill="#1E2B3C">isActive</text>
+<text x="2000" y="294" font-size="12" fill="#5E6E82" text-anchor="end">Boolean</text>
+<text x="1690" y="313" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="313" font-size="12.5" fill="#1E2B3C">createdAt</text>
+<text x="2000" y="313" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<text x="1690" y="332" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="332" font-size="12.5" fill="#1E2B3C">updatedAt</text>
+<text x="2000" y="332" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<rect x="1680" y="377" width="330" height="151" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M1680,413 V387 a10,10 0 0 1 10,-10 H2000 a10,10 0 0 1 10,10 V413 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="1845.0" y="401" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">FacilityDepartment</text>
+<text x="1690" y="437" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="1718" y="437" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="2000" y="437" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1690" y="456" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="1718" y="456" font-size="12.5" fill="#1E2B3C">facilityId</text>
+<text x="2000" y="456" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1690" y="475" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="475" font-size="12.5" fill="#1E2B3C">service</text>
+<text x="2000" y="475" font-size="12" fill="#5E6E82" text-anchor="end">FacilityService</text>
+<text x="1690" y="494" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="494" font-size="12.5" fill="#1E2B3C">name</text>
+<text x="2000" y="494" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1690" y="513" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="513" font-size="12.5" fill="#1E2B3C">phone</text>
+<text x="2000" y="513" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<rect x="2050" y="44" width="330" height="246" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M2050,80 V54 a10,10 0 0 1 10,-10 H2370 a10,10 0 0 1 10,10 V80 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="2215.0" y="68" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">Referral</text>
+<text x="2060" y="104" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="2088" y="104" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="2370" y="104" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="2060" y="123" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="2088" y="123" font-size="12.5" fill="#1E2B3C">consultationId</text>
+<text x="2370" y="123" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="2060" y="142" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="2088" y="142" font-size="12.5" fill="#1E2B3C">babyId</text>
+<text x="2370" y="142" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="2060" y="161" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="2088" y="161" font-size="12.5" fill="#1E2B3C">facilityId</text>
+<text x="2370" y="161" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="2060" y="180" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2088" y="180" font-size="12.5" fill="#1E2B3C">facilityName</text>
+<text x="2370" y="180" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="2060" y="199" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2088" y="199" font-size="12.5" fill="#1E2B3C">urgency</text>
+<text x="2370" y="199" font-size="12" fill="#5E6E82" text-anchor="end">ReferralUrgency</text>
+<text x="2060" y="218" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2088" y="218" font-size="12.5" fill="#1E2B3C">reason</text>
+<text x="2370" y="218" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="2060" y="237" font-size="11" font-weight="bold" fill="#5E6E82">UQ</text>
+<text x="2088" y="237" font-size="12.5" fill="#1E2B3C">code</text>
+<text x="2370" y="237" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="2060" y="256" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2088" y="256" font-size="12.5" fill="#1E2B3C">acknowledgedAt</text>
+<text x="2370" y="256" font-size="12" fill="#5E6E82" text-anchor="end">DateTime?</text>
+<text x="2060" y="275" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2088" y="275" font-size="12.5" fill="#1E2B3C">createdAt</text>
+<text x="2370" y="275" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<rect x="24" y="676" width="330" height="702" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M24,712 V686 a10,10 0 0 1 10,-10 H344 a10,10 0 0 1 10,10 V712 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="189.0" y="700" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">Observation</text>
+<text x="34" y="736" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="62" y="736" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="344" y="736" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="34" y="755" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="62" y="755" font-size="12.5" fill="#1E2B3C">babyId</text>
+<text x="344" y="755" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="34" y="774" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="774" font-size="12.5" fill="#1E2B3C">recordedById</text>
+<text x="344" y="774" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="34" y="793" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="793" font-size="12.5" fill="#1E2B3C">checkType</text>
+<text x="344" y="793" font-size="12" fill="#5E6E82" text-anchor="end">CheckType</text>
+<text x="34" y="812" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="812" font-size="12.5" fill="#1E2B3C">complaints</text>
+<text x="344" y="812" font-size="12" fill="#5E6E82" text-anchor="end">Complaint[]</text>
+<text x="34" y="831" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="831" font-size="12.5" fill="#1E2B3C">complaintText</text>
+<text x="344" y="831" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="34" y="850" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="850" font-size="12.5" fill="#1E2B3C">clientRef</text>
+<text x="344" y="850" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="34" y="869" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="62" y="869" font-size="12.5" fill="#1E2B3C">recheckOfId</text>
+<text x="344" y="869" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="34" y="888" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="888" font-size="12.5" fill="#1E2B3C">observedAt</text>
+<text x="344" y="888" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<text x="34" y="907" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="907" font-size="12.5" fill="#1E2B3C">temperatureC</text>
+<text x="344" y="907" font-size="12" fill="#5E6E82" text-anchor="end">Decimal</text>
+<text x="34" y="926" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="926" font-size="12.5" fill="#1E2B3C">temperatureSrc</text>
+<text x="344" y="926" font-size="12" fill="#5E6E82" text-anchor="end">TemperatureSource</text>
+<text x="34" y="945" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="945" font-size="12.5" fill="#1E2B3C">feedingCount24h</text>
+<text x="344" y="945" font-size="12" fill="#5E6E82" text-anchor="end">Int?</text>
+<text x="34" y="964" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="964" font-size="12.5" fill="#1E2B3C">feedingQuality</text>
+<text x="344" y="964" font-size="12" fill="#5E6E82" text-anchor="end">FeedingQuality?</text>
+<text x="34" y="983" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="983" font-size="12.5" fill="#1E2B3C">stoolPattern</text>
+<text x="344" y="983" font-size="12" fill="#5E6E82" text-anchor="end">StoolPattern?</text>
+<text x="34" y="1002" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1002" font-size="12.5" fill="#1E2B3C">skinColor</text>
+<text x="344" y="1002" font-size="12" fill="#5E6E82" text-anchor="end">SkinColor?</text>
+<text x="34" y="1021" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1021" font-size="12.5" fill="#1E2B3C">cry</text>
+<text x="344" y="1021" font-size="12" fill="#5E6E82" text-anchor="end">CryDescription?</text>
+<text x="34" y="1040" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1040" font-size="12.5" fill="#1E2B3C">activity</text>
+<text x="344" y="1040" font-size="12" fill="#5E6E82" text-anchor="end">ActivityLevel?</text>
+<text x="34" y="1059" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1059" font-size="12.5" fill="#1E2B3C">breathing</text>
+<text x="344" y="1059" font-size="12" fill="#5E6E82" text-anchor="end">BreathingStatus?</text>
+<text x="34" y="1078" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1078" font-size="12.5" fill="#1E2B3C">respiratoryRate</text>
+<text x="344" y="1078" font-size="12" fill="#5E6E82" text-anchor="end">Int?</text>
+<text x="34" y="1097" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1097" font-size="12.5" fill="#1E2B3C">chestIndrawing</text>
+<text x="344" y="1097" font-size="12" fill="#5E6E82" text-anchor="end">Boolean?</text>
+<text x="34" y="1116" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1116" font-size="12.5" fill="#1E2B3C">breathingSound</text>
+<text x="344" y="1116" font-size="12" fill="#5E6E82" text-anchor="end">BreathingSound?</text>
+<text x="34" y="1135" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1135" font-size="12.5" fill="#1E2B3C">jaundice</text>
+<text x="344" y="1135" font-size="12" fill="#5E6E82" text-anchor="end">JaundiceLevel?</text>
+<text x="34" y="1154" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1154" font-size="12.5" fill="#1E2B3C">cordStatus</text>
+<text x="344" y="1154" font-size="12" fill="#5E6E82" text-anchor="end">CordStatus?</text>
+<text x="34" y="1173" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1173" font-size="12.5" fill="#1E2B3C">vomiting</text>
+<text x="344" y="1173" font-size="12" fill="#5E6E82" text-anchor="end">VomitingStatus?</text>
+<text x="34" y="1192" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1192" font-size="12.5" fill="#1E2B3C">roomFeel</text>
+<text x="344" y="1192" font-size="12" fill="#5E6E82" text-anchor="end">RoomFeel?</text>
+<text x="34" y="1211" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1211" font-size="12.5" fill="#1E2B3C">clothing</text>
+<text x="344" y="1211" font-size="12" fill="#5E6E82" text-anchor="end">ClothingLevel?</text>
+<text x="34" y="1230" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1230" font-size="12.5" fill="#1E2B3C">convulsions</text>
+<text x="344" y="1230" font-size="12" fill="#5E6E82" text-anchor="end">Boolean?</text>
+<text x="34" y="1249" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1249" font-size="12.5" fill="#1E2B3C">notes</text>
+<text x="344" y="1249" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="34" y="1268" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1268" font-size="12.5" fill="#1E2B3C">photoKey</text>
+<text x="344" y="1268" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="34" y="1287" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="62" y="1287" font-size="12.5" fill="#1E2B3C">voiceNoteId</text>
+<text x="344" y="1287" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="34" y="1306" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1306" font-size="12.5" fill="#1E2B3C">riskLevel</text>
+<text x="344" y="1306" font-size="12" fill="#5E6E82" text-anchor="end">RiskLevel</text>
+<text x="34" y="1325" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1325" font-size="12.5" fill="#1E2B3C">riskReasons</text>
+<text x="344" y="1325" font-size="12" fill="#5E6E82" text-anchor="end">Json</text>
+<text x="34" y="1344" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1344" font-size="12.5" fill="#1E2B3C">riskEngineVer</text>
+<text x="344" y="1344" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="34" y="1363" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1363" font-size="12.5" fill="#1E2B3C">createdAt</text>
+<text x="344" y="1363" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<rect x="394" y="676" width="330" height="208" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M394,712 V686 a10,10 0 0 1 10,-10 H714 a10,10 0 0 1 10,10 V712 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="559.0" y="700" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">Recheck</text>
+<text x="404" y="736" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="432" y="736" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="714" y="736" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="404" y="755" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="432" y="755" font-size="12.5" fill="#1E2B3C">babyId</text>
+<text x="714" y="755" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="404" y="774" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="432" y="774" font-size="12.5" fill="#1E2B3C">observationId</text>
+<text x="714" y="774" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="404" y="793" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="793" font-size="12.5" fill="#1E2B3C">reason</text>
+<text x="714" y="793" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="404" y="812" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="812" font-size="12.5" fill="#1E2B3C">dueAt</text>
+<text x="714" y="812" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<text x="404" y="831" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="831" font-size="12.5" fill="#1E2B3C">status</text>
+<text x="714" y="831" font-size="12" fill="#5E6E82" text-anchor="end">RecheckStatus</text>
+<text x="404" y="850" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="850" font-size="12.5" fill="#1E2B3C">notifiedAt</text>
+<text x="714" y="850" font-size="12" fill="#5E6E82" text-anchor="end">DateTime?</text>
+<text x="404" y="869" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="869" font-size="12.5" fill="#1E2B3C">createdAt</text>
+<text x="714" y="869" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<rect x="394" y="914" width="330" height="284" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M394,950 V924 a10,10 0 0 1 10,-10 H714 a10,10 0 0 1 10,10 V950 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="559.0" y="938" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">VoiceNote</text>
+<text x="404" y="974" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="432" y="974" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="714" y="974" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="404" y="993" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="432" y="993" font-size="12.5" fill="#1E2B3C">ownerId</text>
+<text x="714" y="993" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="404" y="1012" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="432" y="1012" font-size="12.5" fill="#1E2B3C">babyId</text>
+<text x="714" y="1012" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="404" y="1031" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="1031" font-size="12.5" fill="#1E2B3C">storageKey</text>
+<text x="714" y="1031" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="404" y="1050" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="1050" font-size="12.5" fill="#1E2B3C">mimeType</text>
+<text x="714" y="1050" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="404" y="1069" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="1069" font-size="12.5" fill="#1E2B3C">sizeBytes</text>
+<text x="714" y="1069" font-size="12" fill="#5E6E82" text-anchor="end">Int</text>
+<text x="404" y="1088" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="1088" font-size="12.5" fill="#1E2B3C">status</text>
+<text x="714" y="1088" font-size="12" fill="#5E6E82" text-anchor="end">VoiceNoteStatus</text>
+<text x="404" y="1107" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="1107" font-size="12.5" fill="#1E2B3C">transcript</text>
+<text x="714" y="1107" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="404" y="1126" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="1126" font-size="12.5" fill="#1E2B3C">language</text>
+<text x="714" y="1126" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="404" y="1145" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="1145" font-size="12.5" fill="#1E2B3C">detectedComplaints</text>
+<text x="714" y="1145" font-size="12" fill="#5E6E82" text-anchor="end">Complaint[]</text>
+<text x="404" y="1164" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="1164" font-size="12.5" fill="#1E2B3C">createdAt</text>
+<text x="714" y="1164" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<text x="404" y="1183" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="1183" font-size="12.5" fill="#1E2B3C">updatedAt</text>
+<text x="714" y="1183" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<rect x="852" y="676" width="330" height="550" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M852,712 V686 a10,10 0 0 1 10,-10 H1172 a10,10 0 0 1 10,10 V712 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="1017.0" y="700" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">ClinicianProfile</text>
+<text x="862" y="736" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="890" y="736" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="1172" y="736" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="862" y="755" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="890" y="755" font-size="12.5" fill="#1E2B3C">userId</text>
+<text x="1172" y="755" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="862" y="774" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="774" font-size="12.5" fill="#1E2B3C">title</text>
+<text x="1172" y="774" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="862" y="793" font-size="11" font-weight="bold" fill="#5E6E82">UQ</text>
+<text x="890" y="793" font-size="12.5" fill="#1E2B3C">licenseNumber</text>
+<text x="1172" y="793" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="862" y="812" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="812" font-size="12.5" fill="#1E2B3C">specialties</text>
+<text x="1172" y="812" font-size="12" fill="#5E6E82" text-anchor="end">String[]</text>
+<text x="862" y="831" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="831" font-size="12.5" fill="#1E2B3C">bio</text>
+<text x="1172" y="831" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="862" y="850" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="850" font-size="12.5" fill="#1E2B3C">currentFacility</text>
+<text x="1172" y="850" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="862" y="869" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="869" font-size="12.5" fill="#1E2B3C">yearsExperience</text>
+<text x="1172" y="869" font-size="12" fill="#5E6E82" text-anchor="end">Int?</text>
+<text x="862" y="888" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="888" font-size="12.5" fill="#1E2B3C">photoKey</text>
+<text x="1172" y="888" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="862" y="907" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="907" font-size="12.5" fill="#1E2B3C">offersChat</text>
+<text x="1172" y="907" font-size="12" fill="#5E6E82" text-anchor="end">Boolean</text>
+<text x="862" y="926" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="926" font-size="12.5" fill="#1E2B3C">offersAudio</text>
+<text x="1172" y="926" font-size="12" fill="#5E6E82" text-anchor="end">Boolean</text>
+<text x="862" y="945" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="945" font-size="12.5" fill="#1E2B3C">offersVideo</text>
+<text x="1172" y="945" font-size="12" fill="#5E6E82" text-anchor="end">Boolean</text>
+<text x="862" y="964" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="964" font-size="12.5" fill="#1E2B3C">feeChatXaf</text>
+<text x="1172" y="964" font-size="12" fill="#5E6E82" text-anchor="end">Int</text>
+<text x="862" y="983" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="983" font-size="12.5" fill="#1E2B3C">feeAudioXaf</text>
+<text x="1172" y="983" font-size="12" fill="#5E6E82" text-anchor="end">Int</text>
+<text x="862" y="1002" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="1002" font-size="12.5" fill="#1E2B3C">feeVideoXaf</text>
+<text x="1172" y="1002" font-size="12" fill="#5E6E82" text-anchor="end">Int</text>
+<text x="862" y="1021" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="1021" font-size="12.5" fill="#1E2B3C">availableNowUntil</text>
+<text x="1172" y="1021" font-size="12" fill="#5E6E82" text-anchor="end">DateTime?</text>
+<text x="862" y="1040" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="1040" font-size="12.5" fill="#1E2B3C">payoutProvider</text>
+<text x="1172" y="1040" font-size="12" fill="#5E6E82" text-anchor="end">PaymentProvider?</text>
+<text x="862" y="1059" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="1059" font-size="12.5" fill="#1E2B3C">payoutPhone</text>
+<text x="1172" y="1059" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="862" y="1078" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="1078" font-size="12.5" fill="#1E2B3C">verificationStatus</text>
+<text x="1172" y="1078" font-size="12" fill="#5E6E82" text-anchor="end">VerificationStatus</text>
+<text x="862" y="1097" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="1097" font-size="12.5" fill="#1E2B3C">verificationNote</text>
+<text x="1172" y="1097" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="862" y="1116" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="1116" font-size="12.5" fill="#1E2B3C">verifiedAt</text>
+<text x="1172" y="1116" font-size="12" fill="#5E6E82" text-anchor="end">DateTime?</text>
+<text x="862" y="1135" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="1135" font-size="12.5" fill="#1E2B3C">verifiedById</text>
+<text x="1172" y="1135" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="862" y="1154" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="1154" font-size="12.5" fill="#1E2B3C">ratingAvg</text>
+<text x="1172" y="1154" font-size="12" fill="#5E6E82" text-anchor="end">Decimal?</text>
+<text x="862" y="1173" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="1173" font-size="12.5" fill="#1E2B3C">ratingCount</text>
+<text x="1172" y="1173" font-size="12" fill="#5E6E82" text-anchor="end">Int</text>
+<text x="862" y="1192" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="1192" font-size="12.5" fill="#1E2B3C">createdAt</text>
+<text x="1172" y="1192" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<text x="862" y="1211" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="1211" font-size="12.5" fill="#1E2B3C">updatedAt</text>
+<text x="1172" y="1211" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<rect x="1222" y="676" width="330" height="208" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M1222,712 V686 a10,10 0 0 1 10,-10 H1542 a10,10 0 0 1 10,10 V712 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="1387.0" y="700" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">ClinicianDocument</text>
+<text x="1232" y="736" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="1260" y="736" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="1542" y="736" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1232" y="755" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="1260" y="755" font-size="12.5" fill="#1E2B3C">clinicianId</text>
+<text x="1542" y="755" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1232" y="774" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1260" y="774" font-size="12.5" fill="#1E2B3C">type</text>
+<text x="1542" y="774" font-size="12" fill="#5E6E82" text-anchor="end">ClinicianDocumentType</text>
+<text x="1232" y="793" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1260" y="793" font-size="12.5" fill="#1E2B3C">storageKey</text>
+<text x="1542" y="793" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1232" y="812" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1260" y="812" font-size="12.5" fill="#1E2B3C">originalName</text>
+<text x="1542" y="812" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1232" y="831" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1260" y="831" font-size="12.5" fill="#1E2B3C">mimeType</text>
+<text x="1542" y="831" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1232" y="850" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1260" y="850" font-size="12.5" fill="#1E2B3C">sizeBytes</text>
+<text x="1542" y="850" font-size="12" fill="#5E6E82" text-anchor="end">Int</text>
+<text x="1232" y="869" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1260" y="869" font-size="12.5" fill="#1E2B3C">uploadedAt</text>
+<text x="1542" y="869" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<rect x="1222" y="914" width="330" height="151" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M1222,950 V924 a10,10 0 0 1 10,-10 H1542 a10,10 0 0 1 10,10 V950 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="1387.0" y="938" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">ClinicianAvailability</text>
+<text x="1232" y="974" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="1260" y="974" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="1542" y="974" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1232" y="993" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="1260" y="993" font-size="12.5" fill="#1E2B3C">clinicianId</text>
+<text x="1542" y="993" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1232" y="1012" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1260" y="1012" font-size="12.5" fill="#1E2B3C">dayOfWeek</text>
+<text x="1542" y="1012" font-size="12" fill="#5E6E82" text-anchor="end">Int</text>
+<text x="1232" y="1031" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1260" y="1031" font-size="12.5" fill="#1E2B3C">startMinute</text>
+<text x="1542" y="1031" font-size="12" fill="#5E6E82" text-anchor="end">Int</text>
+<text x="1232" y="1050" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1260" y="1050" font-size="12.5" fill="#1E2B3C">endMinute</text>
+<text x="1542" y="1050" font-size="12" fill="#5E6E82" text-anchor="end">Int</text>
+<rect x="1680" y="676" width="330" height="607" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M1680,712 V686 a10,10 0 0 1 10,-10 H2000 a10,10 0 0 1 10,10 V712 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="1845.0" y="700" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">Consultation</text>
+<text x="1690" y="736" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="1718" y="736" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="2000" y="736" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1690" y="755" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="1718" y="755" font-size="12.5" fill="#1E2B3C">babyId</text>
+<text x="2000" y="755" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1690" y="774" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="1718" y="774" font-size="12.5" fill="#1E2B3C">caregiverId</text>
+<text x="2000" y="774" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1690" y="793" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="1718" y="793" font-size="12.5" fill="#1E2B3C">clinicianId</text>
+<text x="2000" y="793" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1690" y="812" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="1718" y="812" font-size="12.5" fill="#1E2B3C">observationId</text>
+<text x="2000" y="812" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="1690" y="831" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="831" font-size="12.5" fill="#1E2B3C">medium</text>
+<text x="2000" y="831" font-size="12" fill="#5E6E82" text-anchor="end">ConsultationMedium</text>
+<text x="1690" y="850" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="850" font-size="12.5" fill="#1E2B3C">timing</text>
+<text x="2000" y="850" font-size="12" fill="#5E6E82" text-anchor="end">ConsultationTiming</text>
+<text x="1690" y="869" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="869" font-size="12.5" fill="#1E2B3C">status</text>
+<text x="2000" y="869" font-size="12" fill="#5E6E82" text-anchor="end">ConsultationStatus</text>
+<text x="1690" y="888" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="888" font-size="12.5" fill="#1E2B3C">scheduledAt</text>
+<text x="2000" y="888" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<text x="1690" y="907" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="907" font-size="12.5" fill="#1E2B3C">acceptDeadline</text>
+<text x="2000" y="907" font-size="12" fill="#5E6E82" text-anchor="end">DateTime?</text>
+<text x="1690" y="926" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="926" font-size="12.5" fill="#1E2B3C">reason</text>
+<text x="2000" y="926" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="1690" y="945" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="945" font-size="12.5" fill="#1E2B3C">preConsultChecklist</text>
+<text x="2000" y="945" font-size="12" fill="#5E6E82" text-anchor="end">Json?</text>
+<text x="1690" y="964" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="964" font-size="12.5" fill="#1E2B3C">feeXaf</text>
+<text x="2000" y="964" font-size="12" fill="#5E6E82" text-anchor="end">Int</text>
+<text x="1690" y="983" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="983" font-size="12.5" fill="#1E2B3C">commissionXaf</text>
+<text x="2000" y="983" font-size="12" fill="#5E6E82" text-anchor="end">Int</text>
+<text x="1690" y="1002" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="1002" font-size="12.5" fill="#1E2B3C">clinicianEarningXaf</text>
+<text x="2000" y="1002" font-size="12" fill="#5E6E82" text-anchor="end">Int</text>
+<text x="1690" y="1021" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="1021" font-size="12.5" fill="#1E2B3C">paymentStatus</text>
+<text x="2000" y="1021" font-size="12" fill="#5E6E82" text-anchor="end">PaymentStatus</text>
+<text x="1690" y="1040" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="1040" font-size="12.5" fill="#1E2B3C">previsitSummary</text>
+<text x="2000" y="1040" font-size="12" fill="#5E6E82" text-anchor="end">Json?</text>
+<text x="1690" y="1059" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="1059" font-size="12.5" fill="#1E2B3C">recordingConsent</text>
+<text x="2000" y="1059" font-size="12" fill="#5E6E82" text-anchor="end">Boolean</text>
+<text x="1690" y="1078" font-size="11" font-weight="bold" fill="#5E6E82">UQ</text>
+<text x="1718" y="1078" font-size="12.5" fill="#1E2B3C">roomName</text>
+<text x="2000" y="1078" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="1690" y="1097" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="1097" font-size="12.5" fill="#1E2B3C">reminderSentAt</text>
+<text x="2000" y="1097" font-size="12" fill="#5E6E82" text-anchor="end">DateTime?</text>
+<text x="1690" y="1116" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="1116" font-size="12.5" fill="#1E2B3C">startedAt</text>
+<text x="2000" y="1116" font-size="12" fill="#5E6E82" text-anchor="end">DateTime?</text>
+<text x="1690" y="1135" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="1135" font-size="12.5" fill="#1E2B3C">endedAt</text>
+<text x="2000" y="1135" font-size="12" fill="#5E6E82" text-anchor="end">DateTime?</text>
+<text x="1690" y="1154" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="1154" font-size="12.5" fill="#1E2B3C">clinicianNotes</text>
+<text x="2000" y="1154" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="1690" y="1173" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="1173" font-size="12.5" fill="#1E2B3C">diagnosisSummary</text>
+<text x="2000" y="1173" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="1690" y="1192" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="1192" font-size="12.5" fill="#1E2B3C">cancelledById</text>
+<text x="2000" y="1192" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="1690" y="1211" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="1211" font-size="12.5" fill="#1E2B3C">cancelReason</text>
+<text x="2000" y="1211" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="1690" y="1230" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="1718" y="1230" font-size="12.5" fill="#1E2B3C">payoutId</text>
+<text x="2000" y="1230" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="1690" y="1249" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="1249" font-size="12.5" fill="#1E2B3C">createdAt</text>
+<text x="2000" y="1249" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<text x="1690" y="1268" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="1268" font-size="12.5" fill="#1E2B3C">updatedAt</text>
+<text x="2000" y="1268" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<rect x="2050" y="676" width="330" height="227" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M2050,712 V686 a10,10 0 0 1 10,-10 H2370 a10,10 0 0 1 10,10 V712 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="2215.0" y="700" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">Message</text>
+<text x="2060" y="736" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="2088" y="736" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="2370" y="736" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="2060" y="755" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="2088" y="755" font-size="12.5" fill="#1E2B3C">consultationId</text>
+<text x="2370" y="755" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="2060" y="774" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="2088" y="774" font-size="12.5" fill="#1E2B3C">senderId</text>
+<text x="2370" y="774" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="2060" y="793" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2088" y="793" font-size="12.5" fill="#1E2B3C">kind</text>
+<text x="2370" y="793" font-size="12" fill="#5E6E82" text-anchor="end">MessageKind</text>
+<text x="2060" y="812" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2088" y="812" font-size="12.5" fill="#1E2B3C">body</text>
+<text x="2370" y="812" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="2060" y="831" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2088" y="831" font-size="12.5" fill="#1E2B3C">attachmentKey</text>
+<text x="2370" y="831" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="2060" y="850" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2088" y="850" font-size="12.5" fill="#1E2B3C">contactMasked</text>
+<text x="2370" y="850" font-size="12" fill="#5E6E82" text-anchor="end">Boolean</text>
+<text x="2060" y="869" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2088" y="869" font-size="12.5" fill="#1E2B3C">readAt</text>
+<text x="2370" y="869" font-size="12" fill="#5E6E82" text-anchor="end">DateTime?</text>
+<text x="2060" y="888" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2088" y="888" font-size="12.5" fill="#1E2B3C">createdAt</text>
+<text x="2370" y="888" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<rect x="2050" y="933" width="330" height="189" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M2050,969 V943 a10,10 0 0 1 10,-10 H2370 a10,10 0 0 1 10,10 V969 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="2215.0" y="957" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">Review</text>
+<text x="2060" y="993" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="2088" y="993" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="2370" y="993" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="2060" y="1012" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="2088" y="1012" font-size="12.5" fill="#1E2B3C">consultationId</text>
+<text x="2370" y="1012" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="2060" y="1031" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="2088" y="1031" font-size="12.5" fill="#1E2B3C">caregiverId</text>
+<text x="2370" y="1031" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="2060" y="1050" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="2088" y="1050" font-size="12.5" fill="#1E2B3C">clinicianId</text>
+<text x="2370" y="1050" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="2060" y="1069" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2088" y="1069" font-size="12.5" fill="#1E2B3C">rating</text>
+<text x="2370" y="1069" font-size="12" fill="#5E6E82" text-anchor="end">Int</text>
+<text x="2060" y="1088" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2088" y="1088" font-size="12.5" fill="#1E2B3C">comment</text>
+<text x="2370" y="1088" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="2060" y="1107" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2088" y="1107" font-size="12.5" fill="#1E2B3C">createdAt</text>
+<text x="2370" y="1107" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<rect x="24" y="1526" width="330" height="284" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M24,1562 V1536 a10,10 0 0 1 10,-10 H344 a10,10 0 0 1 10,10 V1562 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="189.0" y="1550" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">Payment</text>
+<text x="34" y="1586" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="62" y="1586" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="344" y="1586" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="34" y="1605" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="62" y="1605" font-size="12.5" fill="#1E2B3C">consultationId</text>
+<text x="344" y="1605" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="34" y="1624" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1624" font-size="12.5" fill="#1E2B3C">kind</text>
+<text x="344" y="1624" font-size="12" fill="#5E6E82" text-anchor="end">PaymentKind</text>
+<text x="34" y="1643" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1643" font-size="12.5" fill="#1E2B3C">provider</text>
+<text x="344" y="1643" font-size="12" fill="#5E6E82" text-anchor="end">PaymentProvider</text>
+<text x="34" y="1662" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1662" font-size="12.5" fill="#1E2B3C">payerPhone</text>
+<text x="344" y="1662" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="34" y="1681" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1681" font-size="12.5" fill="#1E2B3C">amountXaf</text>
+<text x="344" y="1681" font-size="12" fill="#5E6E82" text-anchor="end">Int</text>
+<text x="34" y="1700" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1700" font-size="12.5" fill="#1E2B3C">status</text>
+<text x="344" y="1700" font-size="12" fill="#5E6E82" text-anchor="end">PaymentStatus</text>
+<text x="34" y="1719" font-size="11" font-weight="bold" fill="#5E6E82">UQ</text>
+<text x="62" y="1719" font-size="12.5" fill="#1E2B3C">externalRef</text>
+<text x="344" y="1719" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="34" y="1738" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1738" font-size="12.5" fill="#1E2B3C">failureReason</text>
+<text x="344" y="1738" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="34" y="1757" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1757" font-size="12.5" fill="#1E2B3C">rawResponse</text>
+<text x="344" y="1757" font-size="12" fill="#5E6E82" text-anchor="end">Json?</text>
+<text x="34" y="1776" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1776" font-size="12.5" fill="#1E2B3C">createdAt</text>
+<text x="344" y="1776" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<text x="34" y="1795" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="62" y="1795" font-size="12.5" fill="#1E2B3C">updatedAt</text>
+<text x="344" y="1795" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<rect x="394" y="1526" width="330" height="227" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M394,1562 V1536 a10,10 0 0 1 10,-10 H714 a10,10 0 0 1 10,10 V1562 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="559.0" y="1550" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">Payout</text>
+<text x="404" y="1586" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="432" y="1586" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="714" y="1586" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="404" y="1605" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="432" y="1605" font-size="12.5" fill="#1E2B3C">clinicianId</text>
+<text x="714" y="1605" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="404" y="1624" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="1624" font-size="12.5" fill="#1E2B3C">periodStart</text>
+<text x="714" y="1624" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<text x="404" y="1643" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="1643" font-size="12.5" fill="#1E2B3C">periodEnd</text>
+<text x="714" y="1643" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<text x="404" y="1662" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="1662" font-size="12.5" fill="#1E2B3C">amountXaf</text>
+<text x="714" y="1662" font-size="12" fill="#5E6E82" text-anchor="end">Int</text>
+<text x="404" y="1681" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="1681" font-size="12.5" fill="#1E2B3C">status</text>
+<text x="714" y="1681" font-size="12" fill="#5E6E82" text-anchor="end">PayoutStatus</text>
+<text x="404" y="1700" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="1700" font-size="12.5" fill="#1E2B3C">paidAt</text>
+<text x="714" y="1700" font-size="12" fill="#5E6E82" text-anchor="end">DateTime?</text>
+<text x="404" y="1719" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="1719" font-size="12.5" fill="#1E2B3C">reference</text>
+<text x="714" y="1719" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="404" y="1738" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="432" y="1738" font-size="12.5" fill="#1E2B3C">createdAt</text>
+<text x="714" y="1738" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<rect x="852" y="1526" width="330" height="170" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M852,1562 V1536 a10,10 0 0 1 10,-10 H1172 a10,10 0 0 1 10,10 V1562 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="1017.0" y="1550" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">DrugChart</text>
+<text x="862" y="1586" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="890" y="1586" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="1172" y="1586" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="862" y="1605" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="890" y="1605" font-size="12.5" fill="#1E2B3C">babyId</text>
+<text x="1172" y="1605" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="862" y="1624" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="890" y="1624" font-size="12.5" fill="#1E2B3C">consultationId</text>
+<text x="1172" y="1624" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="862" y="1643" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="1643" font-size="12.5" fill="#1E2B3C">prescribedById</text>
+<text x="1172" y="1643" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="862" y="1662" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="1662" font-size="12.5" fill="#1E2B3C">startDate</text>
+<text x="1172" y="1662" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<text x="862" y="1681" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="1681" font-size="12.5" fill="#1E2B3C">createdAt</text>
+<text x="1172" y="1681" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<rect x="852" y="1726" width="330" height="208" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M852,1762 V1736 a10,10 0 0 1 10,-10 H1172 a10,10 0 0 1 10,10 V1762 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="1017.0" y="1750" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">DrugChartItem</text>
+<text x="862" y="1786" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="890" y="1786" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="1172" y="1786" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="862" y="1805" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="890" y="1805" font-size="12.5" fill="#1E2B3C">drugChartId</text>
+<text x="1172" y="1805" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="862" y="1824" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="1824" font-size="12.5" fill="#1E2B3C">drugName</text>
+<text x="1172" y="1824" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="862" y="1843" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="1843" font-size="12.5" fill="#1E2B3C">dose</text>
+<text x="1172" y="1843" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="862" y="1862" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="1862" font-size="12.5" fill="#1E2B3C">route</text>
+<text x="1172" y="1862" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="862" y="1881" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="1881" font-size="12.5" fill="#1E2B3C">timesOfDay</text>
+<text x="1172" y="1881" font-size="12" fill="#5E6E82" text-anchor="end">String[]</text>
+<text x="862" y="1900" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="1900" font-size="12.5" fill="#1E2B3C">durationDays</text>
+<text x="1172" y="1900" font-size="12" fill="#5E6E82" text-anchor="end">Int</text>
+<text x="862" y="1919" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="890" y="1919" font-size="12.5" fill="#1E2B3C">instructions</text>
+<text x="1172" y="1919" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<rect x="1222" y="1526" width="330" height="151" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M1222,1562 V1536 a10,10 0 0 1 10,-10 H1542 a10,10 0 0 1 10,10 V1562 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="1387.0" y="1550" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">DoseLog</text>
+<text x="1232" y="1586" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="1260" y="1586" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="1542" y="1586" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1232" y="1605" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="1260" y="1605" font-size="12.5" fill="#1E2B3C">itemId</text>
+<text x="1542" y="1605" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1232" y="1624" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1260" y="1624" font-size="12.5" fill="#1E2B3C">scheduledFor</text>
+<text x="1542" y="1624" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<text x="1232" y="1643" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1260" y="1643" font-size="12.5" fill="#1E2B3C">status</text>
+<text x="1542" y="1643" font-size="12" fill="#5E6E82" text-anchor="end">DoseStatus</text>
+<text x="1232" y="1662" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1260" y="1662" font-size="12.5" fill="#1E2B3C">loggedAt</text>
+<text x="1542" y="1662" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<rect x="1680" y="1526" width="330" height="170" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M1680,1562 V1536 a10,10 0 0 1 10,-10 H2000 a10,10 0 0 1 10,10 V1562 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="1845.0" y="1550" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">Device</text>
+<text x="1690" y="1586" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="1718" y="1586" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="2000" y="1586" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1690" y="1605" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="1718" y="1605" font-size="12.5" fill="#1E2B3C">userId</text>
+<text x="2000" y="1605" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1690" y="1624" font-size="11" font-weight="bold" fill="#5E6E82">UQ</text>
+<text x="1718" y="1624" font-size="12.5" fill="#1E2B3C">expoPushToken</text>
+<text x="2000" y="1624" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1690" y="1643" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="1643" font-size="12.5" fill="#1E2B3C">platform</text>
+<text x="2000" y="1643" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1690" y="1662" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="1662" font-size="12.5" fill="#1E2B3C">lastSeenAt</text>
+<text x="2000" y="1662" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<text x="1690" y="1681" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="1681" font-size="12.5" fill="#1E2B3C">createdAt</text>
+<text x="2000" y="1681" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<rect x="1680" y="1726" width="330" height="246" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M1680,1762 V1736 a10,10 0 0 1 10,-10 H2000 a10,10 0 0 1 10,10 V1762 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="1845.0" y="1750" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">Notification</text>
+<text x="1690" y="1786" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="1718" y="1786" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="2000" y="1786" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1690" y="1805" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="1718" y="1805" font-size="12.5" fill="#1E2B3C">userId</text>
+<text x="2000" y="1805" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1690" y="1824" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="1824" font-size="12.5" fill="#1E2B3C">type</text>
+<text x="2000" y="1824" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1690" y="1843" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="1843" font-size="12.5" fill="#1E2B3C">title</text>
+<text x="2000" y="1843" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1690" y="1862" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="1862" font-size="12.5" fill="#1E2B3C">body</text>
+<text x="2000" y="1862" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="1690" y="1881" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="1881" font-size="12.5" fill="#1E2B3C">data</text>
+<text x="2000" y="1881" font-size="12" fill="#5E6E82" text-anchor="end">Json?</text>
+<text x="1690" y="1900" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="1900" font-size="12.5" fill="#1E2B3C">readAt</text>
+<text x="2000" y="1900" font-size="12" fill="#5E6E82" text-anchor="end">DateTime?</text>
+<text x="1690" y="1919" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="1919" font-size="12.5" fill="#1E2B3C">pushedAt</text>
+<text x="2000" y="1919" font-size="12" fill="#5E6E82" text-anchor="end">DateTime?</text>
+<text x="1690" y="1938" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="1938" font-size="12.5" fill="#1E2B3C">smsAt</text>
+<text x="2000" y="1938" font-size="12" fill="#5E6E82" text-anchor="end">DateTime?</text>
+<text x="1690" y="1957" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="1718" y="1957" font-size="12.5" fill="#1E2B3C">createdAt</text>
+<text x="2000" y="1957" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<rect x="2138" y="1526" width="330" height="265" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M2138,1562 V1536 a10,10 0 0 1 10,-10 H2458 a10,10 0 0 1 10,10 V1562 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="2303.0" y="1550" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">Job</text>
+<text x="2148" y="1586" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="2176" y="1586" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="2458" y="1586" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="2148" y="1605" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2176" y="1605" font-size="12.5" fill="#1E2B3C">queue</text>
+<text x="2458" y="1605" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="2148" y="1624" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2176" y="1624" font-size="12.5" fill="#1E2B3C">payload</text>
+<text x="2458" y="1624" font-size="12" fill="#5E6E82" text-anchor="end">Json</text>
+<text x="2148" y="1643" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2176" y="1643" font-size="12.5" fill="#1E2B3C">status</text>
+<text x="2458" y="1643" font-size="12" fill="#5E6E82" text-anchor="end">JobStatus</text>
+<text x="2148" y="1662" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2176" y="1662" font-size="12.5" fill="#1E2B3C">runAt</text>
+<text x="2458" y="1662" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<text x="2148" y="1681" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2176" y="1681" font-size="12.5" fill="#1E2B3C">attempts</text>
+<text x="2458" y="1681" font-size="12" fill="#5E6E82" text-anchor="end">Int</text>
+<text x="2148" y="1700" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2176" y="1700" font-size="12.5" fill="#1E2B3C">maxAttempts</text>
+<text x="2458" y="1700" font-size="12" fill="#5E6E82" text-anchor="end">Int</text>
+<text x="2148" y="1719" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2176" y="1719" font-size="12.5" fill="#1E2B3C">lastError</text>
+<text x="2458" y="1719" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="2148" y="1738" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2176" y="1738" font-size="12.5" fill="#1E2B3C">lockedAt</text>
+<text x="2458" y="1738" font-size="12" fill="#5E6E82" text-anchor="end">DateTime?</text>
+<text x="2148" y="1757" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2176" y="1757" font-size="12.5" fill="#1E2B3C">finishedAt</text>
+<text x="2458" y="1757" font-size="12" fill="#5E6E82" text-anchor="end">DateTime?</text>
+<text x="2148" y="1776" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2176" y="1776" font-size="12.5" fill="#1E2B3C">createdAt</text>
+<text x="2458" y="1776" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<rect x="2508" y="1526" width="330" height="208" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M2508,1562 V1536 a10,10 0 0 1 10,-10 H2828 a10,10 0 0 1 10,10 V1562 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="2673.0" y="1550" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">WebhookEvent</text>
+<text x="2518" y="1586" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="2546" y="1586" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="2828" y="1586" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="2518" y="1605" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2546" y="1605" font-size="12.5" fill="#1E2B3C">source</text>
+<text x="2828" y="1605" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="2518" y="1624" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2546" y="1624" font-size="12.5" fill="#1E2B3C">externalId</text>
+<text x="2828" y="1624" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="2518" y="1643" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2546" y="1643" font-size="12.5" fill="#1E2B3C">signatureValid</text>
+<text x="2828" y="1643" font-size="12" fill="#5E6E82" text-anchor="end">Boolean</text>
+<text x="2518" y="1662" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2546" y="1662" font-size="12.5" fill="#1E2B3C">payload</text>
+<text x="2828" y="1662" font-size="12" fill="#5E6E82" text-anchor="end">Json</text>
+<text x="2518" y="1681" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2546" y="1681" font-size="12.5" fill="#1E2B3C">processedAt</text>
+<text x="2828" y="1681" font-size="12" fill="#5E6E82" text-anchor="end">DateTime?</text>
+<text x="2518" y="1700" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2546" y="1700" font-size="12.5" fill="#1E2B3C">error</text>
+<text x="2828" y="1700" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="2518" y="1719" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2546" y="1719" font-size="12.5" fill="#1E2B3C">createdAt</text>
+<text x="2828" y="1719" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<rect x="2508" y="1764" width="330" height="208" rx="10" fill="#fff" stroke="#2C6CB5" stroke-width="2"/>
+<path d="M2508,1800 V1774 a10,10 0 0 1 10,-10 H2828 a10,10 0 0 1 10,10 V1800 Z" fill="#62A6EA" stroke="#2C6CB5" stroke-width="2"/>
+<text x="2673.0" y="1788" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">AuditLog</text>
+<text x="2518" y="1824" font-size="11" font-weight="bold" fill="#C2446A">PK</text>
+<text x="2546" y="1824" font-size="12.5" fill="#1E2B3C">id</text>
+<text x="2828" y="1824" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="2518" y="1843" font-size="11" font-weight="bold" fill="#C2446A">FK</text>
+<text x="2546" y="1843" font-size="12.5" fill="#1E2B3C">userId</text>
+<text x="2828" y="1843" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="2518" y="1862" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2546" y="1862" font-size="12.5" fill="#1E2B3C">action</text>
+<text x="2828" y="1862" font-size="12" fill="#5E6E82" text-anchor="end">String</text>
+<text x="2518" y="1881" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2546" y="1881" font-size="12.5" fill="#1E2B3C">entityType</text>
+<text x="2828" y="1881" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="2518" y="1900" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2546" y="1900" font-size="12.5" fill="#1E2B3C">entityId</text>
+<text x="2828" y="1900" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="2518" y="1919" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2546" y="1919" font-size="12.5" fill="#1E2B3C">statusCode</text>
+<text x="2828" y="1919" font-size="12" fill="#5E6E82" text-anchor="end">Int?</text>
+<text x="2518" y="1938" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2546" y="1938" font-size="12.5" fill="#1E2B3C">ip</text>
+<text x="2828" y="1938" font-size="12" fill="#5E6E82" text-anchor="end">String?</text>
+<text x="2518" y="1957" font-size="11" font-weight="bold" fill="#5E6E82"></text>
+<text x="2546" y="1957" font-size="12.5" fill="#1E2B3C">createdAt</text>
+<text x="2828" y="1957" font-size="12" fill="#5E6E82" text-anchor="end">DateTime</text>
+<text x="0" y="2096" font-size="16" fill="#5E6E82">NeoWell database (v2) — generated from prisma/schema.prisma. PK primary key · FK foreign key (arrow → referenced table) · UQ unique · ? nullable · [] list</text>
+</svg>
