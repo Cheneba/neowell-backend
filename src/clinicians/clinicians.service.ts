@@ -14,7 +14,9 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { StorageService } from '../storage/storage.service';
 import { freeSlots } from '../consultations/scheduling';
+import { findOverlap } from './availability';
 import { isAvailableNow, presentPublicClinician } from './clinician-presenter';
+import { sniffDocumentMime } from './file-type';
 import {
   ListCliniciansQuery,
   RegisterClinicianDto,
@@ -115,7 +117,9 @@ export class CliniciansService {
 
   async uploadPhoto(userId: string, file?: Express.Multer.File) {
     if (!file) throw new BadRequestException('file is required');
-    if (!['image/jpeg', 'image/png'].includes(file.mimetype))
+    // The client-supplied MIME type is not trusted: check the file's content.
+    const detected = sniffDocumentMime(file.buffer);
+    if (detected !== 'image/jpeg' && detected !== 'image/png')
       throw new BadRequestException('Only JPEG or PNG images');
     const profile = await this.requireProfile(userId);
     const key = await this.storage.put(
@@ -129,13 +133,19 @@ export class CliniciansService {
     });
     if (profile.photoKey) await this.storage.delete([profile.photoKey]);
     await this.maybeQueueForReview(profile.id);
-    return { photoUrl: this.files.url(key, file.mimetype) };
+    return { photoUrl: this.files.url(key, detected) };
   }
 
   async uploadDocument(userId: string, type: ClinicianDocumentType, file?: Express.Multer.File) {
     if (!file) throw new BadRequestException('file is required');
     if (!ALLOWED_DOCUMENT_MIME.includes(file.mimetype)) {
       throw new BadRequestException(`Allowed file types: ${ALLOWED_DOCUMENT_MIME.join(', ')}`);
+    }
+    const detected = sniffDocumentMime(file.buffer);
+    if (!detected || detected !== file.mimetype) {
+      throw new BadRequestException(
+        'File content does not match an allowed type (PDF, JPEG or PNG)',
+      );
     }
     const profile = await this.requireProfile(userId);
     if (profile.verificationStatus === VerificationStatus.SUSPENDED)
@@ -186,6 +196,9 @@ export class CliniciansService {
     for (const s of dto.slots) {
       if (s.endMinute <= s.startMinute)
         throw new BadRequestException('endMinute must be after startMinute');
+    }
+    if (findOverlap(dto.slots)) {
+      throw new BadRequestException('Availability slots on the same day must not overlap');
     }
     const profile = await this.requireProfile(userId);
     await this.prisma.$transaction([

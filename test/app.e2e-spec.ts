@@ -485,6 +485,9 @@ describe('NeoWell API — caregiver flows (e2e)', () => {
       expect((pdf.body as Buffer).subarray(0, 4).toString()).toBe('%PDF');
     });
 
+    it('rejects an unsupported summary window', () =>
+      h.http().get(`/babies/${newborn}/summary?days=5`).set(auth(token)).expect(400));
+
     it('hides a baby from other caregivers', async () => {
       const other = await caregiver(h, 'Other');
       await h.http().get(`/babies/${newborn}`).set(auth(other)).expect(404);

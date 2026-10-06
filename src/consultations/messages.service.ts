@@ -1,4 +1,5 @@
 import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
+import { sniffDocumentMime } from '../clinicians/file-type';
 import { AuthUser } from '../common/auth-user';
 import { FilesService } from '../files/files.service';
 import { Message } from '../generated/prisma/client';
@@ -10,7 +11,6 @@ import { clinicianDisplayName } from '../clinicians/clinician-presenter';
 import { maskContacts } from './contact-mask';
 import { ConsultationsService } from './consultations.service';
 
-const IMAGE_MIME = ['image/jpeg', 'image/png'];
 const MESSAGE_NOTIFY_THROTTLE_MS = 2 * 60_000;
 
 /** Consultation chat (FR-CONS-07/08). */
@@ -59,7 +59,8 @@ export class MessagesService {
 
   async sendImage(user: AuthUser, consultationId: string, file?: Express.Multer.File) {
     if (!file) throw new BadRequestException('file is required');
-    if (!IMAGE_MIME.includes(file.mimetype))
+    const detected = sniffDocumentMime(file.buffer);
+    if (detected !== 'image/jpeg' && detected !== 'image/png')
       throw new BadRequestException('Only JPEG or PNG images');
     const c = await this.openChat(user, consultationId);
     const key = await this.storage.put(

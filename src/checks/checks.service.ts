@@ -1,4 +1,5 @@
 import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import { sniffDocumentMime } from '../clinicians/file-type';
 import { ConfigService } from '@nestjs/config';
 import { BabiesService } from '../babies/babies.service';
 import { ageDays as ageInDays } from '../babies/baby-facts';
@@ -20,7 +21,6 @@ import {
 } from './question-bank';
 
 export const RECHECK_AFTER_MINUTES = 30;
-const IMAGE_MIME = ['image/jpeg', 'image/png'];
 
 @Injectable()
 export class ChecksService {
@@ -216,7 +216,8 @@ export class ChecksService {
   async attachPhoto(caregiverId: string, babyId: string, id: string, file?: Express.Multer.File) {
     await this.babies.findOwned(caregiverId, babyId);
     if (!file) throw new BadRequestException('file is required');
-    if (!IMAGE_MIME.includes(file.mimetype))
+    const detected = sniffDocumentMime(file.buffer);
+    if (detected !== 'image/jpeg' && detected !== 'image/png')
       throw new BadRequestException('Only JPEG or PNG images');
     const o = await this.prisma.observation.findFirst({ where: { id, babyId } });
     if (!o) throw new BadRequestException('Unknown observation');
@@ -227,7 +228,7 @@ export class ChecksService {
     );
     await this.prisma.observation.update({ where: { id }, data: { photoKey: key } });
     if (o.photoKey) await this.storage.delete([o.photoKey]);
-    return { photoUrl: this.files.url(key, file.mimetype) };
+    return { photoUrl: this.files.url(key, detected) };
   }
 
   async rechecks(caregiverId: string, babyId: string, status?: RecheckStatus) {

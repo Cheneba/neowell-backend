@@ -111,6 +111,41 @@ describe('NeoWell API — clinicians & consultations (e2e)', () => {
         .expect(200);
     });
 
+    it('rejects files whose content does not match the declared type', async () => {
+      await h
+        .http()
+        .post('/clinicians/me/documents')
+        .set(auth(doctor))
+        .field('type', 'MEDICAL_LICENSE')
+        .attach('file', Buffer.from('<?php echo 1;?>'), {
+          filename: 'shell.php',
+          contentType: 'application/pdf',
+        })
+        .expect(400);
+      await h
+        .http()
+        .post('/clinicians/me/photo')
+        .set(auth(doctor))
+        .attach('file', Buffer.from('not an image'), {
+          filename: 'me.png',
+          contentType: 'image/png',
+        })
+        .expect(400);
+    });
+
+    it('rejects overlapping availability slots', () =>
+      h
+        .http()
+        .put('/clinicians/me/availability')
+        .set(auth(doctor))
+        .send({
+          slots: [
+            { dayOfWeek: 1, startMinute: 540, endMinute: 600 },
+            { dayOfWeek: 1, startMinute: 560, endMinute: 620 },
+          ],
+        })
+        .expect(400));
+
     it('needs a photo and the three documents before review', async () => {
       for (const type of ['MEDICAL_LICENSE', 'MEDICAL_DEGREE', 'EMPLOYMENT_PROOF']) {
         await h
