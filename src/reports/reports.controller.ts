@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { BabiesService } from '../babies/babies.service';
 import { AuthUser } from '../common/auth-user';
@@ -24,6 +24,9 @@ export class ReportsController {
     @Param('babyId', ParseUUIDPipe) babyId: string,
     @Query('days') days?: string,
   ) {
+    if (days !== undefined && days !== '3' && days !== '7') {
+      throw new BadRequestException('days must be 3 or 7');
+    }
     await this.babies.findOwned(user.id, babyId);
     return this.reports.summary(babyId, days === '3' ? 3 : 7);
   }

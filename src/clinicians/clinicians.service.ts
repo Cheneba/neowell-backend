@@ -4,6 +4,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { findOverlap } from './availability';
+import { sniffDocumentMime } from './file-type';
 import { Prisma } from '../generated/prisma/client';
 import { ClinicianDocumentType, VerificationStatus } from '../generated/prisma/enums';
 import { PrismaService } from '../prisma/prisma.service';
@@ -76,6 +78,12 @@ export class CliniciansService {
     if (!ALLOWED_DOCUMENT_MIME.includes(file.mimetype)) {
       throw new BadRequestException(`Allowed file types: ${ALLOWED_DOCUMENT_MIME.join(', ')}`);
     }
+    const detected = sniffDocumentMime(file.buffer);
+    if (!detected || detected !== file.mimetype) {
+      throw new BadRequestException(
+        'File content does not match an allowed type (PDF, JPEG or PNG)',
+      );
+    }
     const profile = await this.requireProfile(userId);
     if (profile.verificationStatus === VerificationStatus.SUSPENDED) {
       throw new BadRequestException('Profile is suspended');
@@ -123,6 +131,9 @@ export class CliniciansService {
       if (s.endMinute <= s.startMinute) {
         throw new BadRequestException('endMinute must be after startMinute');
       }
+    }
+    if (findOverlap(dto.slots)) {
+      throw new BadRequestException('Availability slots on the same day must not overlap');
     }
     const profile = await this.requireProfile(userId);
     await this.prisma.$transaction([

@@ -183,6 +183,9 @@ describe('NeoWell API (e2e)', () => {
       expect(res.body).toMatchObject({ checksPerDay: 3, checksLast24h: 2, checksDue: 1 });
     });
 
+    it('rejects an unsupported summary window', () =>
+      http().get(`/babies/${babyId}/summary?days=5`).set(auth(token)).expect(400));
+
     it('builds a 3-day summary', async () => {
       const res = await http().get(`/babies/${babyId}/summary?days=3`).set(auth(token)).expect(200);
       expect(res.body.period.days).toBe(3);
@@ -302,6 +305,29 @@ describe('NeoWell API (e2e)', () => {
         .set(auth(clinicianToken))
         .field('type', 'MEDICAL_LICENSE')
         .attach('file', Buffer.from('hello'), { filename: 'a.txt', contentType: 'text/plain' })
+        .expect(400));
+
+    it('rejects files whose content does not match the declared type', () =>
+      http()
+        .post('/clinicians/me/documents')
+        .set(auth(clinicianToken))
+        .field('type', 'MEDICAL_LICENSE')
+        .attach('file', Buffer.from('<?php echo 1;?>'), {
+          filename: 'shell.php',
+          contentType: 'application/pdf',
+        })
+        .expect(400));
+
+    it('rejects overlapping availability slots', () =>
+      http()
+        .put('/clinicians/me/availability')
+        .set(auth(clinicianToken))
+        .send({
+          slots: [
+            { dayOfWeek: 1, startMinute: 540, endMinute: 600 },
+            { dayOfWeek: 1, startMinute: 560, endMinute: 620 },
+          ],
+        })
         .expect(400));
 
     it('moves to PENDING_REVIEW once all three documents are uploaded', async () => {
