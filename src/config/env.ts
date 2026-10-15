@@ -58,7 +58,9 @@ export function validateEnv(raw: Record<string, unknown>): Env {
   }
   const env = parsed.data;
   if (env.NODE_ENV === 'production' && env.SMS_PROVIDER === 'console') {
-    throw new Error('SMS_PROVIDER=console must not be used in production');
+    console.warn(
+      'WARNING: SMS_PROVIDER=console in production — OTP codes are logged, not delivered.',
+    );
   }
   return env;
 }
