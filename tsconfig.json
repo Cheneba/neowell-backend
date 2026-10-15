@@ -9,6 +9,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "target": "ES2023",
+    "rewriteRelativeImportExtensions": true,
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
