@@ -1,14 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
 
 /**
- * Outbound SMS. Only a development driver exists today; a real gateway
- * (e.g. an MTN/Orange aggregator) plugs in here — it is also the channel for
- * the SMS fallback alerts described in PDR §12.
+ * Outbound SMS port. Drivers (console, twilio, …) implement `send` and are chosen by
+ * SMS_PROVIDER in `notifications.module.ts`. To add a provider, implement this class,
+ * add its name to the env enum and register it in the module's factory.
  */
 export abstract class SmsService {
+  /** Throws when the provider rejects the message, so callers (and the job queue) can retry. */
   abstract send(phone: string, message: string): Promise<void>;
 }
 
+/** Development driver: prints the message to the server log. */
 @Injectable()
 export class ConsoleSmsService extends SmsService {
   private readonly logger = new Logger('SMS');

@@ -504,7 +504,7 @@ export class ConsultationsService implements OnModuleInit {
     const params = { baby: babyName, doctor: clinicianDisplayName(c.clinician) };
     if (action === 'accept')
       await this.notifications.notify(
-        { userId: c.caregiverId, type: 'CONSULT_CONFIRMED', params, data: { url }, sms: true },
+        { userId: c.caregiverId, type: 'CONSULT_CONFIRMED', params, data: { url }, sms: true, email: true },
         tx,
       );
     if (action === 'decline')

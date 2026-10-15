@@ -19,19 +19,47 @@ export const envSchema = z.object({
   OTP_SECRET: secret,
   OTP_TTL_SECONDS: z.coerce.number().int().positive().default(300),
   OTP_MAX_ATTEMPTS: z.coerce.number().int().positive().default(5),
-  SMS_PROVIDER: z.enum(['console']).default('console'),
-  PUSH_DRIVER: z.enum(['expo', 'log']).default('expo'),
-  EXPO_ACCESS_TOKEN: optional(z.string()),
+  SMS_PROVIDER: z.enum(['console', 'twilio']).default('console'),
+  TWILIO_ACCOUNT_SID: optional(z.string()),
+  TWILIO_AUTH_TOKEN: optional(z.string()),
+  /** Sender number or alphanumeric ID; ignored when a messaging service is set. */
+  TWILIO_FROM: optional(z.string()),
+  TWILIO_MESSAGING_SERVICE_SID: optional(z.string()),
 
-  STORAGE_DRIVER: z.enum(['local']).default('local'),
+  EMAIL_PROVIDER: z.enum(['console', 'smtp']).default('console'),
+  EMAIL_FROM: z.string().default('NeoWell <no-reply@neowell.local>'),
+  SMTP_HOST: optional(z.string()),
+  SMTP_PORT: z.coerce.number().int().positive().default(587),
+  /** true = implicit TLS (port 465); false = STARTTLS when offered (port 587). */
+  SMTP_SECURE: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((v) => v === 'true'),
+  SMTP_USER: optional(z.string()),
+  SMTP_PASS: optional(z.string()),
+
+  PUSH_DRIVER: z.enum(['expo', 'fcm', 'log']).default('expo'),
+  EXPO_ACCESS_TOKEN: optional(z.string()),
+  /** Firebase service-account key: the JSON itself, or the JSON base64-encoded (easier in env vars). */
+  FIREBASE_SERVICE_ACCOUNT: optional(z.string()),
+
+  STORAGE_DRIVER: z.enum(['local', 'r2']).default('local'),
   STORAGE_LOCAL_DIR: z.string().default('./uploads'),
+  R2_ACCOUNT_ID: optional(z.string()),
+  R2_ACCESS_KEY_ID: optional(z.string()),
+  R2_SECRET_ACCESS_KEY: optional(z.string()),
+  R2_BUCKET: optional(z.string()),
   MAX_UPLOAD_MB: z.coerce.number().positive().default(10),
   FILE_URL_SECRET: secret,
 
   PLATFORM_COMMISSION_PERCENT: z.coerce.number().min(0).max(100).default(15),
   EMERGENCY_PHONE_NUMBERS: z.string().default(''),
 
-  PAYMENT_PROVIDER: z.enum(['SANDBOX']).default('SANDBOX'),
+  PAYMENT_PROVIDER: z.enum(['SANDBOX', 'CAMPAY']).default('SANDBOX'),
+  /** https://demo.campay.net/api for the sandbox, https://www.campay.net/api for live. */
+  CAMPAY_BASE_URL: z.string().url().default('https://demo.campay.net/api'),
+  CAMPAY_APP_USERNAME: optional(z.string()),
+  CAMPAY_APP_PASSWORD: optional(z.string()),
   PAYMENTS_WEBHOOK_SECRET: secret,
 
   LIVEKIT_URL: optional(z.string().url()),
@@ -57,6 +85,22 @@ export function validateEnv(raw: Record<string, unknown>): Env {
     throw new Error(`Invalid environment configuration:\n${issues.join('\n')}`);
   }
   const env = parsed.data;
+  // Each real driver needs its credentials; fail at boot rather than on the first request.
+  const need = (driver: string, vars: (keyof Env)[]) => {
+    const missing = vars.filter((k) => !env[k]);
+    if (missing.length) throw new Error(`${driver} requires: ${missing.join(', ')}`);
+  };
+  if (env.SMS_PROVIDER === 'twilio') {
+    need('SMS_PROVIDER=twilio', ['TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN']);
+    if (!env.TWILIO_FROM && !env.TWILIO_MESSAGING_SERVICE_SID)
+      throw new Error('SMS_PROVIDER=twilio requires TWILIO_FROM or TWILIO_MESSAGING_SERVICE_SID');
+  }
+  if (env.EMAIL_PROVIDER === 'smtp') need('EMAIL_PROVIDER=smtp', ['SMTP_HOST']);
+  if (env.PUSH_DRIVER === 'fcm') need('PUSH_DRIVER=fcm', ['FIREBASE_SERVICE_ACCOUNT']);
+  if (env.STORAGE_DRIVER === 'r2')
+    need('STORAGE_DRIVER=r2', ['R2_ACCOUNT_ID', 'R2_ACCESS_KEY_ID', 'R2_SECRET_ACCESS_KEY', 'R2_BUCKET']);
+  if (env.PAYMENT_PROVIDER === 'CAMPAY')
+    need('PAYMENT_PROVIDER=CAMPAY', ['CAMPAY_APP_USERNAME', 'CAMPAY_APP_PASSWORD']);
   if (env.NODE_ENV === 'production' && env.SMS_PROVIDER === 'console') {
     throw new Error('SMS_PROVIDER=console must not be used in production');
   }

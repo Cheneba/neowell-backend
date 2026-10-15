@@ -735,7 +735,7 @@ model DoseLog {
 model Device {
   id            String   @id @default(uuid())
   userId        String
-  expoPushToken String   @unique
+  pushToken     String   @unique // FCM or Expo token, whichever PUSH_DRIVER issues
   platform      String // android | ios | web
   lastSeenAt    DateTime @default(now())
   createdAt     DateTime @default(now())

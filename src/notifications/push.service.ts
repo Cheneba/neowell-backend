@@ -1,8 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { Env } from '../config/env';
 
 export interface PushMessage {
+  /** The device's push token, as issued by the active driver. */
   to: string;
   title: string;
   body: string;
@@ -10,56 +9,31 @@ export interface PushMessage {
 }
 
 export type PushTicket =
-  { status: 'ok'; id: string } | { status: 'error'; message: string; details?: { error?: string } };
+  | { status: 'ok'; id: string }
+  | { status: 'error'; message: string; details?: { error?: string } };
 
-const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send';
-const EXPO_RECEIPTS_URL = 'https://exp.host/--/api/v2/push/getReceipts';
+/**
+ * Mobile push port. Drivers (log, expo, fcm, …) are chosen by PUSH_DRIVER in
+ * `notifications.module.ts`. A driver reports a dead token as `details.error = 'DeviceNotRegistered'`
+ * so the caller can drop the device.
+ */
+export abstract class PushService {
+  abstract send(message: PushMessage): Promise<PushTicket>;
+  /** Delivery receipts for earlier tickets, for providers that report them later. */
+  abstract receipts(ids: string[]): Promise<Record<string, PushTicket>>;
+}
 
-/** Expo Push API client (docs/05 Q2, J10). The `log` driver only logs (tests, local). */
+/** Development/test driver: only logs. */
 @Injectable()
-export class PushService {
+export class LogPushService extends PushService {
   private readonly logger = new Logger('Push');
-  private readonly driver: 'expo' | 'log';
-  private readonly token?: string;
-
-  constructor(config: ConfigService<Env, true>) {
-    this.driver = config.get('PUSH_DRIVER', { infer: true });
-    this.token = config.get('EXPO_ACCESS_TOKEN', { infer: true });
-  }
 
   async send(message: PushMessage): Promise<PushTicket> {
-    if (this.driver === 'log') {
-      this.logger.log(`→ ${message.to}: ${message.title} — ${message.body}`);
-      return { status: 'ok', id: `log-${Date.now()}` };
-    }
-    const res = await fetch(EXPO_PUSH_URL, {
-      method: 'POST',
-      headers: this.headers(),
-      body: JSON.stringify([
-        { ...message, sound: 'default', priority: 'high', channelId: 'default' },
-      ]),
-    });
-    if (!res.ok) throw new Error(`Expo push HTTP ${res.status}`);
-    const json = (await res.json()) as { data: PushTicket[] };
-    return json.data[0];
+    this.logger.log(`→ ${message.to}: ${message.title} — ${message.body}`);
+    return { status: 'ok', id: `log-${Date.now()}` };
   }
 
-  async receipts(ids: string[]): Promise<Record<string, PushTicket>> {
-    if (this.driver === 'log' || !ids.length) return {};
-    const res = await fetch(EXPO_RECEIPTS_URL, {
-      method: 'POST',
-      headers: this.headers(),
-      body: JSON.stringify({ ids }),
-    });
-    if (!res.ok) throw new Error(`Expo receipts HTTP ${res.status}`);
-    return ((await res.json()) as { data: Record<string, PushTicket> }).data;
-  }
-
-  private headers(): Record<string, string> {
-    return {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
-    };
+  async receipts(): Promise<Record<string, PushTicket>> {
+    return {};
   }
 }

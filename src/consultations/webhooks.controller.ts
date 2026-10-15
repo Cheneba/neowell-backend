@@ -14,12 +14,12 @@ import { ConfigService } from '@nestjs/config';
 import { ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 import type { Request } from 'express';
-import { WebhookReceiver } from 'livekit-server-sdk';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { Public } from '../common/decorators/public.decorator';
 import { Env } from '../config/env';
 import { Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { CallProvider } from './call-provider';
 import { ConsultationsService } from './consultations.service';
 
 /** Normalised payment provider event (docs/05 W1). */
@@ -36,17 +36,14 @@ interface PaymentEvent {
 export class WebhooksController {
   private readonly logger = new Logger(WebhooksController.name);
   private readonly paymentsSecret: string;
-  private readonly livekit?: WebhookReceiver;
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly consultations: ConsultationsService,
+    private readonly calls: CallProvider,
     config: ConfigService<Env, true>,
   ) {
     this.paymentsSecret = config.get('PAYMENTS_WEBHOOK_SECRET', { infer: true });
-    const key = config.get('LIVEKIT_API_KEY', { infer: true });
-    const secret = config.get('LIVEKIT_API_SECRET', { infer: true });
-    if (key && secret) this.livekit = new WebhookReceiver(key, secret);
   }
 
   /** W1: payment results. Signature = hex HMAC-SHA256 of the raw body. */
@@ -90,10 +87,10 @@ export class WebhooksController {
     @Req() req: Request & { rawBody?: Buffer },
     @Headers('authorization') auth?: string,
   ) {
-    if (!this.livekit || !req.rawBody) return { received: true };
+    if (!this.calls.enabled || !req.rawBody) return { received: true };
     let event;
     try {
-      event = await this.livekit.receive(req.rawBody.toString('utf8'), auth);
+      event = await this.calls.parseWebhook(req.rawBody.toString('utf8'), auth);
     } catch {
       await this.store('livekit', `invalid-${Date.now()}`, false, {});
       return { received: true };
@@ -105,7 +102,7 @@ export class WebhooksController {
       JSON.parse(req.rawBody.toString('utf8')),
     );
     if (!stored) return { received: true };
-    const room = event.room?.name;
+    const room = event.room;
     const c = room
       ? await this.prisma.consultation.findUnique({
           where: { roomName: room },
@@ -114,8 +111,8 @@ export class WebhooksController {
       : null;
     if (c) {
       if (
-        event.event === 'participant_joined' &&
-        event.participant?.identity === c.clinician.userId &&
+        event.type === 'participant_joined' &&
+        event.participantIdentity === c.clinician.userId &&
         c.status === 'CONFIRMED'
       ) {
         await this.prisma.consultation.updateMany({
@@ -123,7 +120,7 @@ export class WebhooksController {
           data: { status: 'IN_PROGRESS', startedAt: new Date() },
         });
       }
-      if (event.event === 'room_finished' && !c.endedAt) {
+      if (event.type === 'room_finished' && !c.endedAt) {
         await this.prisma.consultation.update({
           where: { id: c.id },
           data: { endedAt: new Date() },

@@ -5,16 +5,15 @@ import {
   NotFoundException,
   OnModuleInit,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { BabiesService } from '../babies/babies.service';
 import { detectComplaints } from '../checks/question-bank';
 import { AuthUser } from '../common/auth-user';
-import { Env } from '../config/env';
 import { FilesService } from '../files/files.service';
 import { Role, VoiceNoteStatus } from '../generated/prisma/enums';
 import { JobsService } from '../jobs/jobs.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { StorageService } from '../storage/storage.service';
+import { SpeechToText } from './speech-to-text';
 
 export const AUDIO_MIME = [
   'audio/mp4',
@@ -33,8 +32,6 @@ export const MAX_VOICE_BYTES = 2 * 1024 * 1024;
 @Injectable()
 export class VoiceService implements OnModuleInit {
   private readonly logger = new Logger(VoiceService.name);
-  private readonly sttUrl?: string;
-  private readonly sttModel: string;
 
   constructor(
     private readonly prisma: PrismaService,
@@ -42,11 +39,8 @@ export class VoiceService implements OnModuleInit {
     private readonly storage: StorageService,
     private readonly files: FilesService,
     private readonly jobs: JobsService,
-    config: ConfigService<Env, true>,
-  ) {
-    this.sttUrl = config.get('STT_URL', { infer: true })?.replace(/\/$/, '');
-    this.sttModel = config.get('STT_MODEL', { infer: true });
-  }
+    private readonly stt: SpeechToText,
+  ) {}
 
   onModuleInit() {
     this.jobs.register('voice.transcribe', (p) => this.transcribe(p.voiceNoteId as string));
@@ -100,11 +94,11 @@ export class VoiceService implements OnModuleInit {
     };
   }
 
-  /** Q6: send the audio to the self-hosted OpenAI-compatible speech-to-text endpoint. */
+  /** Q6: send the audio to the configured speech-to-text driver. */
   async transcribe(voiceNoteId: string) {
     const note = await this.prisma.voiceNote.findUnique({ where: { id: voiceNoteId } });
     if (!note || note.status !== VoiceNoteStatus.PENDING) return { skipped: true };
-    if (!this.sttUrl) {
+    if (!this.stt.enabled) {
       await this.prisma.voiceNote.update({
         where: { id: note.id },
         data: { status: VoiceNoteStatus.SKIPPED },
@@ -112,30 +106,18 @@ export class VoiceService implements OnModuleInit {
       return { status: 'SKIPPED' };
     }
     const audio = await this.storage.read(note.storageKey);
-    const form = new FormData();
-    form.append(
-      'file',
-      new Blob([new Uint8Array(audio)], { type: note.mimeType }),
+    const { text, language } = await this.stt.transcribe(
+      audio,
+      note.mimeType,
       `note.${note.storageKey.split('.').pop()}`,
     );
-    form.append('model', this.sttModel);
-    form.append('response_format', 'verbose_json');
-    const res = await fetch(`${this.sttUrl}/v1/audio/transcriptions`, {
-      method: 'POST',
-      body: form,
-    });
-    if (!res.ok) {
-      this.logger.warn(`Speech-to-text HTTP ${res.status} for voice note ${note.id}`);
-      throw new Error(`Speech-to-text HTTP ${res.status}`);
-    }
-    const body = (await res.json()) as { text?: string; language?: string };
-    const transcript = (body.text ?? '').trim();
+    const transcript = text;
     await this.prisma.voiceNote.update({
       where: { id: note.id },
       data: {
         status: VoiceNoteStatus.TRANSCRIBED,
         transcript,
-        language: body.language ?? null,
+        language: language ?? null,
         detectedComplaints: detectComplaints(transcript),
       },
     });

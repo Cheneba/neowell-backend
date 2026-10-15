@@ -2,6 +2,8 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Prisma } from '../generated/prisma/client';
 import { JobsService } from '../jobs/jobs.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { Realtime } from '../realtime/realtime.service';
+import { EmailService } from './email.service';
 import { PushService } from './push.service';
 import { SmsService } from './sms.service';
 import { render } from './templates';
@@ -14,6 +16,8 @@ export interface NotifyInput {
   data?: Record<string, unknown>;
   /** Fall back to SMS when the user has no push device (FR-NOT-03). */
   sms?: boolean;
+  /** Also email the user, when they have an address on file. */
+  email?: boolean;
 }
 
 /** In-app inbox + push + SMS fallback (FR-NOT, docs/05 Q1–Q3). */
@@ -24,6 +28,8 @@ export class NotificationsService implements OnModuleInit {
     private readonly jobs: JobsService,
     private readonly push: PushService,
     private readonly sms: SmsService,
+    private readonly email: EmailService,
+    private readonly realtime: Realtime,
   ) {}
 
   onModuleInit() {
@@ -33,6 +39,9 @@ export class NotificationsService implements OnModuleInit {
     );
     this.jobs.register('sms.send', (p) =>
       this.sendSms(p as { phone: string; message: string; notificationId?: string }),
+    );
+    this.jobs.register('email.send', (p) =>
+      this.sendEmail(p as { to: string; subject: string; text: string; notificationId?: string }),
     );
   }
 
@@ -58,10 +67,27 @@ export class NotificationsService implements OnModuleInit {
         data: (input.data ?? {}) as Prisma.InputJsonValue,
       },
     });
+    // Open app → instant WebSocket event; every registered phone also gets a push.
+    const live = this.realtime.emitToUser(user.id, 'notification', {
+      id: notification.id,
+      type: notification.type,
+      title,
+      body,
+      data: notification.data,
+      createdAt: notification.createdAt,
+    });
     for (const d of user.devices) {
       await this.jobs.enqueue('push.send', {
         notificationId: notification.id,
-        token: d.expoPushToken,
+        token: d.pushToken,
+      });
+    }
+    if (input.email && user.email) {
+      await this.jobs.enqueue('email.send', {
+        to: user.email,
+        subject: `NeoWell: ${title}`,
+        text: body,
+        notificationId: notification.id,
       });
     }
     if (!user.devices.length && input.sms) {
@@ -71,7 +97,7 @@ export class NotificationsService implements OnModuleInit {
         notificationId: notification.id,
       });
     }
-    return { notificationId: notification.id, devices: user.devices.length };
+    return { notificationId: notification.id, devices: user.devices.length, live };
   }
 
   /** Q2 */
@@ -86,7 +112,7 @@ export class NotificationsService implements OnModuleInit {
     });
     if (ticket.status === 'error') {
       if (ticket.details?.error === 'DeviceNotRegistered') {
-        await this.prisma.device.deleteMany({ where: { expoPushToken: token } });
+        await this.prisma.device.deleteMany({ where: { pushToken: token } });
         return { removedDevice: true };
       }
       throw new Error(ticket.message);
@@ -114,6 +140,21 @@ export class NotificationsService implements OnModuleInit {
     }
   }
 
+  private async sendEmail({
+    to,
+    subject,
+    text,
+    notificationId,
+  }: {
+    to: string;
+    subject: string;
+    text: string;
+    notificationId?: string;
+  }) {
+    await this.email.send({ to, subject, text });
+    return { to, notificationId };
+  }
+
   /** J10: drop devices whose push tickets came back DeviceNotRegistered. */
   async checkReceipts() {
     const since = new Date(Date.now() - 60 * 60_000);
@@ -131,23 +172,23 @@ export class NotificationsService implements OnModuleInit {
       .filter(([, r]) => r.status === 'error' && r.details?.error === 'DeviceNotRegistered')
       .map(([id]) => tickets.get(id)!);
     if (dead.length)
-      await this.prisma.device.deleteMany({ where: { expoPushToken: { in: dead } } });
+      await this.prisma.device.deleteMany({ where: { pushToken: { in: dead } } });
     return dead.length;
   }
 
   // ── Inbox & devices (FR-ACC-05/06) ──────────────────────────
 
-  async registerDevice(userId: string, expoPushToken: string, platform: string) {
+  async registerDevice(userId: string, pushToken: string, platform: string) {
     return this.prisma.device.upsert({
-      where: { expoPushToken },
+      where: { pushToken },
       update: { userId, platform, lastSeenAt: new Date() },
-      create: { userId, expoPushToken, platform },
+      create: { userId, pushToken, platform },
       select: { id: true },
     });
   }
 
   async removeDevice(userId: string, token: string) {
-    await this.prisma.device.deleteMany({ where: { userId, expoPushToken: token } });
+    await this.prisma.device.deleteMany({ where: { userId, pushToken: token } });
   }
 
   async inbox(userId: string, limit = 30, cursor?: string) {

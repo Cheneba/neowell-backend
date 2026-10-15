@@ -7,8 +7,8 @@ import { Env } from '../config/env';
 
 /**
  * Private object storage for PHI and credential documents.
- * Only a local-disk driver exists; swap in S3/GCS (with server-side encryption)
- * before production (NFR-SEC-03). Files are only ever served through signed links.
+ * Drivers: local disk (dev) and Cloudflare R2 (STORAGE_DRIVER, see storage.module.ts).
+ * Files are only ever served through signed links.
  */
 export abstract class StorageService {
   /** Stores the bytes under `prefix/` and returns the opaque storage key. */
