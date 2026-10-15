@@ -1,0 +1,190 @@
+/**
+ * Creates the "NeoWell — Manual Test Checklist" Google Form in your Google Drive.
+ * Generated from docs/testing/checklist.json by docs/testing/build.js. Do not edit by hand.
+ * How to use: open https://script.google.com, New project, paste this file, run createNeoWellTestForm.
+ */
+const CHECKLIST = {
+  "title": "NeoWell — Manual Test Checklist",
+  "version": "App v2 (mobile) · Backend v2",
+  "setup": [
+    "The test coordinator runs the backend with the demo doctor seeded (SEED_DEMO_CLINICIAN_PHONE) and JOBS_ENABLED=true, and points the app at it (EXPO_PUBLIC_API_URL).",
+    "Sign-in codes are not sent by SMS yet: ask the coordinator for your 6-digit code (it is printed in the backend log).",
+    "Payments are a sandbox: they confirm by themselves after about 3 seconds. A payer number ending in 000 makes the payment fail on purpose.",
+    "Use two phones or two browser windows: one as a parent, one as the demo doctor.",
+    "For each item, mark Pass, Fail or Not tested. For every Fail, write what you did, what you expected and what you saw."
+  ],
+  "sections": [
+    {
+      "title": "1. Sign-in and onboarding",
+      "items": [
+        "Language switch (English / Français) on the sign-in screen changes the text",
+        "An invalid phone number shows an error; 6 70 00 00 00 is accepted",
+        "A wrong code shows an error; 'Send a new code' and 'Change number' work",
+        "Profile: first and last name are required; after typing the last name, a note says the baby will be called 'Baby {last name}'",
+        "Consent: cannot continue until the first box is ticked; the disclaimer is shown",
+        "After closing and reopening the app, you are still signed in"
+      ]
+    },
+    {
+      "title": "2. Home (parent)",
+      "items": [
+        "Greeting with your first name, bell with unread dot, tabs Home / Doctors / Inbox / Me",
+        "Empty state 'Add your baby…' when there is no baby",
+        "Baby card shows name, age (plus corrected age if preterm) and 'Needs extra care' when relevant",
+        "Baby card shows the last result badge, checks due today, Start check and Baby is unwell",
+        "Tip of the day and 'Nearest health facilities' are shown"
+      ]
+    },
+    {
+      "title": "3. Add / edit a baby",
+      "items": [
+        "Step 1: sex, date of birth (a future date is rejected), optional name with the 6-week naming note",
+        "Step 2: weeks of pregnancy, weight, length and head circumference are required; out-of-range values are rejected; 45,5 (comma) is accepted",
+        "Step 3: birth facility can be searched or typed; 'Where is the baby now?' offers home / hospital / kangaroo care",
+        "A baby born before 37 weeks or under 2.5 kg shows risk factors and 'Needs extra care'",
+        "In hospital or kangaroo care: home checks are paused; 'My baby is home now' resumes them",
+        "Edit saves changes; Remove asks for confirmation",
+        "A baby born 42+ days ago without a name shows 'add your baby's name'; once a name is added it replaces 'Baby X' ('Bébé X' in French)"
+      ]
+    },
+    {
+      "title": "4. Baby overview, growth and history",
+      "items": [
+        "Overview shows Today (checks per day and times), Growth, Recent checks, Medicines and Consultations",
+        "Growth shows weight, length and head size with WHO pills (usual range / outside / far outside)",
+        "Preterm babies show 'Compared using corrected age'",
+        "Update measurements: values are pre-filled, at least one must change, and the new entry appears in the list",
+        "History lists every check with date, temperature, result badge, findings, check type and photo"
+      ]
+    },
+    {
+      "title": "5. Daily check",
+      "items": [
+        "Temperature comes first with big +/- buttons; values outside 30–43 °C are rejected",
+        "Room and clothing questions appear only when the temperature is high or low",
+        "Feeds counter works; the breath counter opens a 60-second tap screen",
+        "Danger answers turn red when chosen; a photo can be added",
+        "Normal answers give a green 'All looks well' result"
+      ]
+    },
+    {
+      "title": "6. 'Baby is unwell' check",
+      "items": [
+        "Complaint grid allows several choices; free-text box; voice note up to 60 s (phone only)",
+        "Follow-up questions match the complaints chosen",
+        "Fever 38–38.9 °C in a baby over 3 months: yellow result with cooling steps and a 30-minute re-check card",
+        "After a re-check is due, Home shows a 'Re-check now' banner",
+        "Fever in a baby under 3 months, or any danger sign: red 'Seek care now', no-medicines warning, emergency call buttons",
+        "Red/yellow results offer 'Find the nearest facility' and 'Talk to a doctor'",
+        "Choosing twitching / fits shows the explanation of what fits look like"
+      ]
+    },
+    {
+      "title": "7. Offline",
+      "items": [
+        "With no internet, finishing a check shows 'saved, will send automatically' and Home shows 'waiting to send'",
+        "An offline check with a danger sign still shows 'Seek care now'",
+        "Back online, the check is sent by itself and is not duplicated"
+      ]
+    },
+    {
+      "title": "8. Nearest facilities",
+      "items": [
+        "Location permission is asked; facilities are listed by distance with services",
+        "Each department has a call button that opens the phone dialler"
+      ]
+    },
+    {
+      "title": "9. Doctors, booking and payment",
+      "items": [
+        "Doctors tab shows your active consultations, the privacy note and filters (All / Available now / Chat / Voice / Video)",
+        "Doctor card and profile show photo, verified tick, rating, fees per medium and weekly hours",
+        "Booking: choose baby, medium (with price), ASAP or a time slot, and a reason",
+        "After a fever result and 'Talk to a doctor', the 'Before you book, have you…' checklist appears",
+        "Paying with MTN or Orange shows 'Approve the payment on your phone…', then opens the consultation",
+        "A payer number ending in 000 fails and lets you retry"
+      ]
+    },
+    {
+      "title": "10. Consultation (parent)",
+      "items": [
+        "Status and banner change: waiting for the doctor → confirmed → in progress → completed",
+        "Chat is closed until the doctor accepts; then text and photos send and arrive within about 5 seconds",
+        "A phone number typed in a message is hidden",
+        "Voice/video consultations show 'Join the call' (opens in the browser; needs call settings on the backend)",
+        "Referral card shows facility, urgency, code and call buttons; Medicines card links to the medicines screen",
+        "Cancel explains the refund rule; a completed consultation can be rated once with 1–5 hearts"
+      ]
+    },
+    {
+      "title": "11. Medicines",
+      "items": [
+        "Each medicine shows dose, route, times and instructions, with Given / Skip per dose time",
+        "Dose alarms and check reminders appear as phone notifications (not on the web version)"
+      ]
+    },
+    {
+      "title": "12. Inbox and Me (parent)",
+      "items": [
+        "Inbox lists notifications (confirmed, new message, referral, medicines); unread are highlighted",
+        "Tapping a notification opens the right screen; 'Mark all as read' works",
+        "Me: name and phone, language switch (whole app changes language), consent toggles",
+        "Export my data works; Delete my account explains the 30 days and asks for confirmation; Sign out works"
+      ]
+    },
+    {
+      "title": "13. Doctor (sign in with 'I am a doctor')",
+      "items": [
+        "New doctor: setup form with fees per medium and payout number is required before anything else",
+        "Verification: upload photo, licence, degree and proof of employment; status becomes 'We are checking your documents'",
+        "Demo doctor: 'Available now' switch (Off / 1 h / 2 h / 4 h)",
+        "New requests show 'Answer before …' with Accept / Decline; Today & upcoming and Past sections are filled",
+        "Consultation room: patient summary (risk factors, growth, 7-day checks, temperature range) and the mother's checklist",
+        "Chat, Start, Complete (assessment and notes), 'Mother did not come' and Cancel work",
+        "Prescribe (medicines, time chips, days) and Refer (facility, urgency, reason) appear on the parent's side",
+        "Earnings show to be paid, paid, completed count and payouts",
+        "Me: 'How mothers see you' preview, edit profile, weekly availability (invalid hours rejected), verification, language, sign out"
+      ]
+    }
+  ],
+  "notTestable": "Not testable yet: real SMS, real mobile money, push notifications from the server (needs an EAS project id), voice-note transcription (needs the speech-to-text server), and the disease knowledge base (waiting for the product owner's spreadsheet)."
+};
+
+function createNeoWellTestForm() {
+  const form = FormApp.create(CHECKLIST.title);
+  form.setDescription(
+    CHECKLIST.version + '\n\nBefore you start:\n- ' + CHECKLIST.setup.join('\n- ') + '\n\n' + CHECKLIST.notTestable,
+  );
+  form.setProgressBar(true);
+  form.setCollectEmail(false);
+
+  form.addTextItem().setTitle('Your name').setRequired(true);
+  form.addTextItem().setTitle('Device and OS').setHelpText('e.g. Tecno Spark 10, Android 13, or "web browser"').setRequired(true);
+  form.addMultipleChoiceItem().setTitle('Which role did you test?').setChoiceValues(['Parent', 'Doctor', 'Both']).setRequired(true);
+  form.addMultipleChoiceItem().setTitle('App language used').setChoiceValues(['English', 'Français', 'Both']).setRequired(true);
+
+  CHECKLIST.sections.forEach(function (section) {
+    form.addPageBreakItem().setTitle(section.title);
+    form
+      .addGridItem()
+      .setTitle(section.title + ': results')
+      .setHelpText('N/T = not tested')
+      .setRows(section.items)
+      .setColumns(['Pass', 'Fail', 'N/T']);
+    form
+      .addParagraphTextItem()
+      .setTitle(section.title + ': problems found')
+      .setHelpText('For each Fail: what you did, what you expected, what you saw. Mention the check text.');
+  });
+
+  form.addPageBreakItem().setTitle('Overall');
+  form.addScaleItem().setTitle('How easy was the app to use?').setBounds(1, 5).setLabels('Very hard', 'Very easy');
+  form.addParagraphTextItem().setTitle('Overall comments and suggestions');
+
+  const sheet = SpreadsheetApp.create(CHECKLIST.title + ' (responses)');
+  form.setDestination(FormApp.DestinationType.SPREADSHEET, sheet.getId());
+
+  Logger.log('Edit the form:   ' + form.getEditUrl());
+  Logger.log('Send to testers: ' + form.getPublishedUrl());
+  Logger.log('Responses sheet: ' + sheet.getUrl());
+}
