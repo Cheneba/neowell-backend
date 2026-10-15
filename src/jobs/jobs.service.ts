@@ -59,7 +59,11 @@ export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
 
   onApplicationBootstrap() {
     if (!this.enabled) return;
-    this.timer = setInterval(() => void this.poll(), this.pollMs);
+    this.timer = setInterval(() => {
+      this.poll().catch((e) =>
+        this.logger.error(`Job poll failed: ${e instanceof Error ? e.message : String(e)}`),
+      );
+    }, this.pollMs);
   }
 
   onModuleDestroy() {
