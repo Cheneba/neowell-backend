@@ -3,8 +3,7 @@ dist/
 coverage/
 src/generated/
 uploads/
-.env
-.env.*
+.env*
 !.env.example
 *.log
 tsconfig*.tsbuildinfo

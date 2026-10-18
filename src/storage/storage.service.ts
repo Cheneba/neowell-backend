@@ -102,9 +102,7 @@ export class R2StorageService extends StorageService {
   }
 
   async read(key: string): Promise<Buffer> {
-    const res = await this.client.send(
-      new GetObjectCommand({ Bucket: this.bucket, Key: key }),
-    );
+    const res = await this.client.send(new GetObjectCommand({ Bucket: this.bucket, Key: key }));
     const bytes = await res.Body?.transformToByteArray();
     if (!bytes) throw new Error(`Empty object: ${key}`);
     return Buffer.from(bytes);
@@ -112,7 +110,9 @@ export class R2StorageService extends StorageService {
 
   async delete(keys: string[]): Promise<void> {
     await Promise.all(
-      keys.map((key) => this.client.send(new DeleteObjectCommand({ Bucket: this.bucket, Key: key }))),
+      keys.map((key) =>
+        this.client.send(new DeleteObjectCommand({ Bucket: this.bucket, Key: key })),
+      ),
     );
   }
 }

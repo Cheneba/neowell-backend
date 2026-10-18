@@ -19,9 +19,15 @@ const envBase = z.object({
   OTP_SECRET: secret,
   OTP_TTL_SECONDS: z.coerce.number().int().positive().default(300),
   OTP_MAX_ATTEMPTS: z.coerce.number().int().positive().default(5),
-  SMS_PROVIDER: z.enum(['console']).default('console'),
-  PUSH_DRIVER: z.enum(['expo', 'log']).default('expo'),
+  SMS_PROVIDER: z.enum(['console', 'twilio']).default('console'),
+  TWILIO_ACCOUNT_SID: optional(z.string()),
+  TWILIO_AUTH_TOKEN: optional(z.string()),
+  TWILIO_FROM: optional(z.string()),
+  TWILIO_MESSAGING_SERVICE_SID: optional(z.string()),
+
+  PUSH_DRIVER: z.enum(['expo', 'log', 'fcm']).default('expo'),
   EXPO_ACCESS_TOKEN: optional(z.string()),
+  FIREBASE_SERVICE_ACCOUNT: optional(z.string()),
 
   STORAGE_DRIVER: z.enum(['local', 'r2']).default('local'),
   STORAGE_LOCAL_DIR: z.string().default('./uploads'),
@@ -38,8 +44,13 @@ const envBase = z.object({
   PLATFORM_COMMISSION_PERCENT: z.coerce.number().min(0).max(100).default(15),
   EMERGENCY_PHONE_NUMBERS: z.string().default(''),
 
-  PAYMENT_PROVIDER: z.enum(['SANDBOX']).default('SANDBOX'),
+  PAYMENT_PROVIDER: z.enum(['SANDBOX', 'CAMPAY']).default('SANDBOX'),
   PAYMENTS_WEBHOOK_SECRET: secret,
+
+  CAMPAY_BASE_URL: optional(z.string().url()),
+  CAMPAY_APP_USERNAME: optional(z.string()),
+  CAMPAY_APP_PASSWORD: optional(z.string()),
+  CAMPAY_PERMANENT_TOKEN: optional(z.string()),
 
   LIVEKIT_URL: optional(z.string().url()),
   LIVEKIT_API_KEY: optional(z.string()),
@@ -56,6 +67,47 @@ const envBase = z.object({
 });
 
 export const envSchema = envBase.superRefine((env, ctx) => {
+  if (env.SMS_PROVIDER === 'twilio') {
+    for (const key of ['TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN'] as const) {
+      if (!env[key]) {
+        ctx.addIssue({ code: 'custom', path: [key], message: 'required when SMS_PROVIDER=twilio' });
+      }
+    }
+    if (!env.TWILIO_FROM && !env.TWILIO_MESSAGING_SERVICE_SID) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['TWILIO_FROM'],
+        message: 'set TWILIO_FROM or TWILIO_MESSAGING_SERVICE_SID when SMS_PROVIDER=twilio',
+      });
+    }
+  }
+
+  if (env.PUSH_DRIVER === 'fcm' && !env.FIREBASE_SERVICE_ACCOUNT) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['FIREBASE_SERVICE_ACCOUNT'],
+      message: 'required when PUSH_DRIVER=fcm',
+    });
+  }
+
+  if (env.PAYMENT_PROVIDER === 'CAMPAY') {
+    if (!env.CAMPAY_BASE_URL) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['CAMPAY_BASE_URL'],
+        message: 'required when PAYMENT_PROVIDER=CAMPAY',
+      });
+    }
+    if (!env.CAMPAY_PERMANENT_TOKEN && !(env.CAMPAY_APP_USERNAME && env.CAMPAY_APP_PASSWORD)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['CAMPAY_APP_USERNAME'],
+        message:
+          'set CAMPAY_PERMANENT_TOKEN, or both CAMPAY_APP_USERNAME and CAMPAY_APP_PASSWORD, when PAYMENT_PROVIDER=CAMPAY',
+      });
+    }
+  }
+
   if (env.STORAGE_DRIVER !== 'r2') return;
   if (!env.R2_ACCOUNT_ID && !env.R2_ENDPOINT) {
     ctx.addIssue({
