@@ -8,7 +8,11 @@ export function setupApp(app: INestApplication): void {
   const config = app.get<ConfigService<Env, true>>(ConfigService);
   const origins = config.get('CORS_ORIGINS', { infer: true });
 
-  app.use(helmet());
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+    }),
+  );
   app.enableCors({
     origin: origins === '*' ? true : origins.split(',').map((o) => o.trim()),
   });

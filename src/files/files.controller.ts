@@ -25,6 +25,7 @@ export class FilesController {
       throw new NotFoundException();
     });
     res.setHeader('Content-Type', file.mime);
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
     res.setHeader('Cache-Control', 'private, max-age=600');
     return new StreamableFile(data);
   }
