@@ -20,6 +20,7 @@ import { JobsModule } from './jobs/jobs.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { PaymentsModule } from './payments/payments.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { RealtimeModule } from './realtime/realtime.module';
 import { ReportsModule } from './reports/reports.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
 import { StorageModule } from './storage/storage.module';
@@ -38,6 +39,7 @@ import { VoiceModule } from './voice/voice.module';
     }),
     PrismaModule,
     JobsModule,
+    RealtimeModule,
     NotificationsModule,
     StorageModule,
     PaymentsModule,

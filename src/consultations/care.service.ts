@@ -52,6 +52,7 @@ export class CareService {
           params: { facility: facilityName!, baby: baby.displayName, code },
           data: { url: `/consultation/${c.id}` },
           sms: true,
+          email: true,
         },
         tx,
       );

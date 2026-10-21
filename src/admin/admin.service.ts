@@ -67,6 +67,7 @@ export class AdminService {
         userId: profile.userId,
         type: dto.decision === 'VERIFIED' ? 'CLINICIAN_VERIFIED' : 'CLINICIAN_REJECTED',
         params: { note: dto.note ?? '' },
+        email: true,
       });
     }
     return updated;

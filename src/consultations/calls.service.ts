@@ -5,13 +5,13 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AccessToken } from 'livekit-server-sdk';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { AuthUser } from '../common/auth-user';
 import { Env } from '../config/env';
 import { ConsultationMedium, Role } from '../generated/prisma/enums';
 import { PrismaService } from '../prisma/prisma.service';
 import { clinicianDisplayName } from '../clinicians/clinician-presenter';
+import { CallProvider } from './call-provider';
 import { ConsultationsService } from './consultations.service';
 
 const LINK_TTL_S = 2 * 60 * 60;
@@ -27,23 +27,19 @@ interface CallLink {
 export class CallsService {
   private readonly secret: string;
   private readonly baseUrl: string;
-  private readonly livekit?: { url: string; key: string; secret: string };
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly consultations: ConsultationsService,
+    private readonly provider: CallProvider,
     config: ConfigService<Env, true>,
   ) {
     this.secret = `call:${config.get('FILE_URL_SECRET', { infer: true })}`;
     this.baseUrl = config.get('PUBLIC_BASE_URL', { infer: true }).replace(/\/$/, '');
-    const url = config.get('LIVEKIT_URL', { infer: true });
-    const key = config.get('LIVEKIT_API_KEY', { infer: true });
-    const sec = config.get('LIVEKIT_API_SECRET', { infer: true });
-    if (url && key && sec) this.livekit = { url, key, secret: sec };
   }
 
   get enabled() {
-    return !!this.livekit;
+    return this.provider.enabled;
   }
 
   async joinLink(user: AuthUser, consultationId: string) {
@@ -51,7 +47,7 @@ export class CallsService {
     if (c.medium === ConsultationMedium.CHAT)
       throw new ConflictException('This is a chat consultation');
     if (!this.consultations.canJoinCall(c)) throw new ConflictException('The call is not open yet');
-    if (!this.livekit)
+    if (!this.provider.enabled)
       throw new ServiceUnavailableException('Calls are not configured on this server');
     const exp = Math.floor(Date.now() / 1000) + LINK_TTL_S;
     const payload = Buffer.from(
@@ -67,7 +63,7 @@ export class CallsService {
   /** Validates a call link and returns what the call page needs. */
   async pageData(token: string) {
     const [payload, sig] = token.split('.');
-    if (!payload || !sig || !this.livekit) throw new NotFoundException();
+    if (!payload || !sig || !this.provider.enabled) throw new NotFoundException();
     const expected = Buffer.from(this.sign(payload));
     if (expected.length !== Buffer.from(sig).length || !timingSafeEqual(expected, Buffer.from(sig)))
       throw new NotFoundException();
@@ -80,21 +76,15 @@ export class CallsService {
       user.role === Role.CLINICIAN
         ? clinicianDisplayName(c.clinician)
         : [user.firstName, user.lastName?.[0] ? `${user.lastName[0]}.` : ''].join(' ').trim();
-    const at = new AccessToken(this.livekit.key, this.livekit.secret, {
+    const joinToken = await this.provider.createJoinToken({
       identity: user.id,
       name,
-      ttl: '2h',
-    });
-    at.addGrant({
-      roomJoin: true,
       room: c.roomName ?? `nw-${c.id}`,
-      canPublish: true,
-      canSubscribe: true,
-      canPublishData: false,
+      ttlSeconds: 2 * 60 * 60,
     });
     return {
-      url: this.livekit.url,
-      token: await at.toJwt(),
+      url: this.provider.serverUrl,
+      token: joinToken,
       video: c.medium === ConsultationMedium.VIDEO,
       name,
       lang: user.locale,

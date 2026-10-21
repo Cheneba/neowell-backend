@@ -1,57 +1,56 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { Env } from '../config/env';
-import { CollectRequest, GatewayResult, GatewayStatus, PaymentGateway } from './payment-gateway';
+import {
+  CollectRequest,
+  GatewayResult,
+  GatewayStatus,
+  PaymentGateway,
+} from './payment-gateway';
+
+export interface CampayConfig {
+  baseUrl: string;
+  /** Either a permanent access token, or an app username + password. */
+  permanentToken?: string;
+  username?: string;
+  password?: string;
+}
+
+type FetchLike = typeof fetch;
+
+/** Campay: "237XXXXXXXXX" with no plus sign. */
+const toMsisdn = (phone: string) => phone.replace(/\D/g, '');
 
 /**
- * CamPay aggregator (MTN MoMo + Orange Money, FR-PAY / docs/05 W1/Q4/Q5).
- * Auth is either a permanent token from the dashboard or a short-lived token
- * fetched with the app username/password. Collections are approved by the payer
- * on their phone; status is polled as a webhook backup.
+ * Campay (MTN MoMo + Orange Money) adapter. Status is polled by the `payment.status` job, so
+ * Campay's webhook is not needed. Refunds are sent back with a withdrawal.
  */
-@Injectable()
-export class CamPayGateway extends PaymentGateway {
-  /** Mobile-money approval is not instant. */
-  readonly firstPollDelayMs = 5_000;
-  private readonly base: string;
-  private readonly username?: string;
-  private readonly password?: string;
-  private readonly permanentToken?: string;
-  private token?: string;
-  private tokenExpiresAt = 0;
+export class CampayPaymentGateway extends PaymentGateway {
+  readonly firstPollDelayMs = 15_000;
+  private token?: { value: string; expiresAt: number };
 
-  constructor(config: ConfigService<Env, true>) {
+  constructor(
+    private readonly cfg: CampayConfig,
+    private readonly fetchImpl: FetchLike = fetch,
+  ) {
     super();
-    this.base = (config.get('CAMPAY_BASE_URL', { infer: true }) as string).replace(/\/+$/, '');
-    this.username = config.get('CAMPAY_APP_USERNAME', { infer: true });
-    this.password = config.get('CAMPAY_APP_PASSWORD', { infer: true });
-    this.permanentToken = config.get('CAMPAY_PERMANENT_TOKEN', { infer: true });
   }
 
   async collect(req: CollectRequest): Promise<GatewayResult> {
-    const res = await this.request<{ reference: string; status?: string; reason?: string }>(
-      'collect/',
-      {
-        amount: String(req.amountXaf),
-        currency: 'XAF',
-        from: normalizePhone(req.payerPhone),
-        description: req.description,
-        external_reference: req.paymentId,
-      },
-    );
-    return { externalRef: res.reference, status: mapStatus(res.status), reason: res.reason };
+    const res = await this.call<{ reference: string }>('POST', '/collect/', {
+      amount: String(req.amountXaf),
+      from: toMsisdn(req.payerPhone),
+      description: req.description,
+      external_reference: req.paymentId,
+    });
+    return { externalRef: res.reference, status: 'PENDING' };
   }
 
-  async status(payment: {
-    externalRef: string;
-    payerPhone: string;
-  }): Promise<{ status: GatewayStatus; reason?: string }> {
-    const res = await this.request<{ status?: string; reason?: string }>(
-      `transaction/${encodeURIComponent(payment.externalRef)}/`,
-      undefined,
+  async status(payment: { externalRef: string }) {
+    const res = await this.call<{ status: string; reason?: string }>(
       'GET',
+      `/transaction/${encodeURIComponent(payment.externalRef)}/`,
     );
-    return { status: mapStatus(res.status), reason: res.reason };
+    const status: GatewayStatus =
+      res.status === 'SUCCESSFUL' ? 'SUCCESSFUL' : res.status === 'FAILED' ? 'FAILED' : 'PENDING';
+    return { status, reason: status === 'FAILED' ? (res.reason ?? 'Payment failed') : undefined };
   }
 
   async refund(req: {
@@ -59,69 +58,45 @@ export class CamPayGateway extends PaymentGateway {
     amountXaf: number;
     payerPhone: string;
   }): Promise<GatewayResult> {
-    const res = await this.request<{ reference: string; status?: string; reason?: string }>(
-      'deposit/',
-      {
-        amount: String(req.amountXaf),
-        currency: 'XAF',
-        to: normalizePhone(req.payerPhone),
-        description: `NeoWell refund ${req.originalRef.slice(0, 12)}`,
-        external_reference: `refund-${req.originalRef}`,
-      },
-    );
-    return { externalRef: res.reference, status: mapStatus(res.status), reason: res.reason };
+    const res = await this.call<{ reference: string }>('POST', '/withdraw/', {
+      amount: String(req.amountXaf),
+      to: toMsisdn(req.payerPhone),
+      description: 'NeoWell refund',
+      external_reference: `refund-${req.originalRef}`,
+    });
+    return { externalRef: res.reference, status: 'PENDING' };
   }
 
-  private async authToken(): Promise<string> {
-    if (this.permanentToken) return this.permanentToken;
-    if (this.token && Date.now() < this.tokenExpiresAt) return this.token;
-    if (!this.username || !this.password) throw new Error('CamPay credentials are not configured');
-    const res = await fetch(`${this.base}/token/`, {
+  private async getToken(): Promise<string> {
+    if (this.cfg.permanentToken) return this.cfg.permanentToken;
+    if (this.token && this.token.expiresAt > Date.now()) return this.token.value;
+    const res = await this.fetchImpl(`${this.cfg.baseUrl}/token/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: this.username, password: this.password }),
+      body: JSON.stringify({ username: this.cfg.username, password: this.cfg.password }),
     });
-    const text = await res.text();
-    if (!res.ok) throw new Error(`CamPay auth failed: HTTP ${res.status} ${text.slice(0, 200)}`);
-    const json = JSON.parse(text) as { token: string; expires_in?: number };
-    this.token = json.token;
-    // Refresh a little early to avoid racing the expiry.
-    this.tokenExpiresAt = Date.now() + Math.max((json.expires_in ?? 3600) - 60, 60) * 1000;
-    return this.token;
+    const body = (await res.json().catch(() => ({}))) as { token?: string };
+    if (!res.ok || !body.token) throw new Error(`Campay auth failed (${res.status})`);
+    // Campay tokens last about 3 minutes; refresh a little early.
+    this.token = { value: body.token, expiresAt: Date.now() + 120_000 };
+    return body.token;
   }
 
-  private async request<T>(
-    path: string,
-    body?: Record<string, unknown>,
-    method: 'GET' | 'POST' = 'POST',
-  ): Promise<T> {
-    const token = await this.authToken();
-    const res = await fetch(`${this.base}/${path}`, {
+  private async call<T>(method: 'GET' | 'POST', path: string, body?: unknown): Promise<T> {
+    const res = await this.fetchImpl(`${this.cfg.baseUrl}${path}`, {
       method,
-      headers: { Authorization: `Token ${token}`, 'Content-Type': 'application/json' },
-      ...(body ? { body: JSON.stringify(body) } : {}),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Token ${await this.getToken()}`,
+      },
+      body: body === undefined ? undefined : JSON.stringify(body),
     });
-    const text = await res.text();
-    if (!res.ok) throw new Error(`CamPay ${path} failed: HTTP ${res.status} ${text.slice(0, 200)}`);
-    return (text ? JSON.parse(text) : {}) as T;
-  }
-}
-
-/** CamPay expects MSISDN without the leading `+` (e.g. 2376xxxxxxxx). */
-function normalizePhone(phone: string): string {
-  return phone.replace(/^\+/, '');
-}
-
-function mapStatus(status?: string): GatewayStatus {
-  switch ((status ?? '').toUpperCase()) {
-    case 'SUCCESSFUL':
-    case 'SUCCESS':
-      return 'SUCCESSFUL';
-    case 'FAILED':
-    case 'FAILURE':
-    case 'CANCELLED':
-      return 'FAILED';
-    default:
-      return 'PENDING';
+    const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+    if (!res.ok) {
+      if (res.status === 401) this.token = undefined;
+      const msg = (json.message ?? json.detail ?? json.error ?? 'request failed') as string;
+      throw new Error(`Campay ${method} ${path} failed (${res.status}): ${msg}`);
+    }
+    return json as T;
   }
 }

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -19,7 +20,8 @@ import {
   IsInt,
   IsOptional,
   IsUUID,
-  Matches,
+  IsString,
+  Length,
   Max,
   Min,
 } from 'class-validator';
@@ -28,10 +30,11 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { NotificationsService } from './notifications.service';
 
 class RegisterDeviceDto {
-  @Matches(/^(Exponent|Expo)PushToken\[.+\]$/, {
-    message: 'expoPushToken must be an Expo push token',
-  })
-  expoPushToken: string;
+  /** FCM registration token (or an Expo token, depending on PUSH_DRIVER). */
+  @IsOptional() @IsString() @Length(20, 4096) pushToken?: string;
+
+  /** Older app builds send this name. */
+  @IsOptional() @IsString() @Length(20, 4096) expoPushToken?: string;
 
   @IsIn(['android', 'ios', 'web'])
   platform: string;
@@ -56,7 +59,9 @@ export class NotificationsController {
   /** Register this phone for push notifications (FR-ACC-05). */
   @Post('devices')
   registerDevice(@CurrentUser() user: AuthUser, @Body() dto: RegisterDeviceDto) {
-    return this.notifications.registerDevice(user.id, dto.expoPushToken, dto.platform);
+    const token = dto.pushToken ?? dto.expoPushToken;
+    if (!token) throw new BadRequestException('pushToken is required');
+    return this.notifications.registerDevice(user.id, token, dto.platform);
   }
 
   @Delete('devices/:token')

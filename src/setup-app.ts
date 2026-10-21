@@ -1,5 +1,6 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { WsAdapter } from '@nestjs/platform-ws';
 import helmet from 'helmet';
 import { Env } from './config/env';
 
@@ -23,5 +24,6 @@ export function setupApp(app: INestApplication): void {
       transform: true,
     }),
   );
+  app.useWebSocketAdapter(new WsAdapter(app));
   app.enableShutdownHooks();
 }
