@@ -5,7 +5,7 @@ import { Env } from '../config/env';
 import { SmsService } from '../notifications/sms.service';
 import { PrismaService } from '../prisma/prisma.service';
 
-const RESEND_COOLDOWN_MS = 30_000;
+const RESEND_COOLDOWN_MS = 60_000;
 const MAX_REQUESTS_PER_HOUR = 5;
 
 @Injectable()

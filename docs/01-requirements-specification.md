@@ -63,7 +63,7 @@ Each requirement has an ID that the API and background-process specs refer to. *
 
 | ID | Requirement | Pri |
 |---|---|---|
-| FR-AUTH-01 | Users sign in with a phone number (E.164) and a 6-digit SMS code (OTP). Codes expire after 5 minutes and allow 5 attempts. Resend has a 30 s cooldown, with at most 5 codes per hour per number. | M |
+| FR-AUTH-01 | Users sign in with a phone number (E.164) and a 6-digit SMS code (OTP). Codes expire after 5 minutes and allow 5 attempts. Resend has a 60 s cooldown, with at most 5 codes per hour per number. | M |
 | FR-AUTH-02 | Sessions use a 15-minute access token plus a 30-day refresh token. Refresh rotates the token; reuse of a rotated token revokes every session of that user. | M |
 | FR-AUTH-03 | On first sign-in the user chooses Caregiver or Clinician. Admin can never be self-assigned. | M |
 | FR-AUTH-04 | Sign-out revokes the refresh token. | M |
