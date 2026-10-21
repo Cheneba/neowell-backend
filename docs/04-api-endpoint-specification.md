@@ -43,7 +43,7 @@
 | `GET /me` | Any | — | Profile: `id, phone, email, firstName, lastName, role, locale, region, city, consent*At, profileComplete, deletionRequestedAt` | ACC-01, ACC-07 |
 | `PATCH /me` | Any | `{ firstName?, lastName?, email?, locale?, region?, city? }` | Profile | ACC-01, ACC-07 |
 | `PUT /me/consents` | Any | `{ dataCollection?, clinicianShare?, recording? }` (true = grant, false = withdraw) | Profile | ACC-02 |
-| `GET /me/export` | C | — | `{ exportedAt, profile, babies[{…, measurements, observations, consultations}] }` | ACC-03 |
+| ~~`GET /me/export`~~ (disabled; `UsersService.export` kept) | C | — | `{ exportedAt, profile, babies[{…, measurements, observations, consultations}] }` | ACC-03 |
 | `DELETE /me` | C, D | — | `202 { purgeAfter }`. Access ends now; purge by job J9. | ACC-04 |
 | `POST /me/devices` | Any | `{ expoPushToken, platform }` | `201 { id }` (upsert by token) | ACC-05 |
 | `DELETE /me/devices/:token` | Any | — | `204` | ACC-05 |

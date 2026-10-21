@@ -193,7 +193,7 @@ Each screen lists: **purpose · content · primary action · states · API**.
 | **Consultation room** | Header: doctor, status pill, time. Banner by status (waiting for the doctor / confirmed at … / in progress / completed). **Chat**: REPORT card first, bubbles, photos; composer (disabled when closed). Call button (audio/video) when the window is open → opens the call page. Cards: referral (facility, urgency, code, call buttons), drug chart (→ Medicines), cancel button (with refund rule), review prompt when completed. | Send / Join call | polling every 5 s while open | `GET /consultations/:id`, messages, `POST …/messages`, `…/image`, `…/call`, `…/cancel` |
 | **Review** | 5 hearts + comment | Submit | once only | `POST …/review` |
 | **Inbox** (tab) | Notifications list, unread bold, tap → deep link; "Mark all read" | — | empty | `GET /me/notifications`, `POST …/read` |
-| **Me** (tab) | Profile (name, phone), language, consents toggles, **Export my data** (share JSON), **Delete my account** (confirm dialog explaining the 30-day purge), sign out | — | | `GET/PATCH /me`, `PUT /me/consents`, `GET /me/export`, `DELETE /me` |
+| **Me** (tab) | Profile (name, phone), language, consents toggles, **Delete my account** (confirm dialog explaining the 30-day purge), sign out | — | | `GET/PATCH /me`, `PUT /me/consents`, `DELETE /me` |
 
 ### 6.3 Clinician
 

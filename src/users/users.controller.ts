@@ -28,12 +28,13 @@ export class UsersController {
     return this.users.updateConsents(user.id, dto);
   }
 
-  /** Download all your data as JSON (FR-ACC-03). */
-  @Get('export')
-  @Roles(Role.CAREGIVER)
-  export(@CurrentUser() user: AuthUser) {
-    return this.users.export(user.id);
-  }
+  // Disabled: the app no longer offers "Export my data". UsersService.export() is kept for later.
+  // /** Download all your data as JSON (FR-ACC-03). */
+  // @Get('export')
+  // @Roles(Role.CAREGIVER)
+  // export(@CurrentUser() user: AuthUser) {
+  //   return this.users.export(user.id);
+  // }
 
   /** Delete your account: access ends now, data is purged after 30 days (FR-ACC-04). */
   @Delete()

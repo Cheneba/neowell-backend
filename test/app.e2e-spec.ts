@@ -528,7 +528,7 @@ describe('NeoWell API — caregiver flows (e2e)', () => {
   });
 
   describe('account (FR-ACC)', () => {
-    it('exports data, deletes the account and purges it after 30 days', async () => {
+    it('deletes the account and purges it after 30 days', async () => {
       const phone = h.newPhone();
       const token = await h.login(phone);
       await h
@@ -552,9 +552,8 @@ describe('NeoWell API — caregiver flows (e2e)', () => {
         .send({ temperatureC: 36.8 })
         .expect(201);
 
-      const exported = await h.http().get('/me/export').set(auth(token)).expect(200);
-      expect(exported.body.babies[0].observations).toHaveLength(1);
-      expect(exported.body.babies[0].measurements).toHaveLength(1);
+      // GET /me/export is disabled (see users.controller.ts).
+      await h.http().get('/me/export').set(auth(token)).expect(404);
 
       const del = await h.http().delete('/me').set(auth(token)).expect(202);
       expect(new Date(del.body.purgeAfter).getTime()).toBeGreaterThan(Date.now() + 29 * 86_400_000);
