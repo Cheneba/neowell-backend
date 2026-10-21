@@ -15,8 +15,9 @@ import { PaymentGateway, SandboxPaymentGateway } from './payment-gateway';
         if (c.get('PAYMENT_PROVIDER', { infer: true }) === 'CAMPAY')
           return new CampayPaymentGateway({
             baseUrl: c.get('CAMPAY_BASE_URL', { infer: true }).replace(/\/+$/, ''),
-            username: c.get('CAMPAY_APP_USERNAME', { infer: true })!,
-            password: c.get('CAMPAY_APP_PASSWORD', { infer: true })!,
+            username: c.get('CAMPAY_APP_USERNAME', { infer: true }),
+            password: c.get('CAMPAY_APP_PASSWORD', { infer: true }),
+            permanentToken: c.get('CAMPAY_PERMANENT_TOKEN', { infer: true }),
           });
         return new SandboxPaymentGateway();
       },

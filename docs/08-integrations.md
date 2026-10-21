@@ -56,7 +56,7 @@ Connect to `wss://<host>/ws`, then send `{"event":"auth","data":{"token":"<acces
 - **R2**: create a private bucket and an API token with Object Read & Write. Set `R2_ACCOUNT_ID`,
   `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` and `R2_BUCKET`.
 - **Campay**: `CAMPAY_BASE_URL` is `https://demo.campay.net/api` for testing and
-  `https://www.campay.net/api` for live. Status is polled by the `payment.status` job.
+  `https://www.campay.net/api` for live. Auth is `CAMPAY_PERMANENT_TOKEN`, or `CAMPAY_APP_USERNAME` + `CAMPAY_APP_PASSWORD`. Status is polled by the `payment.status` job, so Campay's webhook is not used.
 
 ## Live testing (admin)
 

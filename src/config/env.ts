@@ -60,6 +60,8 @@ export const envSchema = z.object({
   CAMPAY_BASE_URL: z.string().url().default('https://demo.campay.net/api'),
   CAMPAY_APP_USERNAME: optional(z.string()),
   CAMPAY_APP_PASSWORD: optional(z.string()),
+  /** Alternative to username/password: the app's permanent access token. */
+  CAMPAY_PERMANENT_TOKEN: optional(z.string()),
   PAYMENTS_WEBHOOK_SECRET: secret,
 
   LIVEKIT_URL: optional(z.string().url()),
@@ -99,7 +101,7 @@ export function validateEnv(raw: Record<string, unknown>): Env {
   if (env.PUSH_DRIVER === 'fcm') need('PUSH_DRIVER=fcm', ['FIREBASE_SERVICE_ACCOUNT']);
   if (env.STORAGE_DRIVER === 'r2')
     need('STORAGE_DRIVER=r2', ['R2_ACCOUNT_ID', 'R2_ACCESS_KEY_ID', 'R2_SECRET_ACCESS_KEY', 'R2_BUCKET']);
-  if (env.PAYMENT_PROVIDER === 'CAMPAY')
+  if (env.PAYMENT_PROVIDER === 'CAMPAY' && !env.CAMPAY_PERMANENT_TOKEN)
     need('PAYMENT_PROVIDER=CAMPAY', ['CAMPAY_APP_USERNAME', 'CAMPAY_APP_PASSWORD']);
   if (env.NODE_ENV === 'production' && env.SMS_PROVIDER === 'console') {
     throw new Error('SMS_PROVIDER=console must not be used in production');

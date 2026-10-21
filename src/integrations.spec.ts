@@ -103,6 +103,14 @@ describe('CampayPaymentGateway', () => {
       external_reference: 'pay-1',
     });
   });
+  it('uses a permanent token without logging in', async () => {
+    const f = jest.fn().mockResolvedValue(json(200, { status: 'PENDING' }));
+    await new CampayPaymentGateway({ baseUrl: cfg.baseUrl, permanentToken: 'perm' }, f).status({
+      externalRef: 'r',
+    });
+    expect(f).toHaveBeenCalledTimes(1);
+    expect(f.mock.calls[0][1].headers.Authorization).toBe('Token perm');
+  });
   it('maps statuses and reuses the token', async () => {
     const f = jest
       .fn()

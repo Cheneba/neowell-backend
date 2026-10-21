@@ -20,6 +20,10 @@ describe('validateEnv drivers', () => {
   ])('rejects %j without credentials', (extra, missing) =>
     expect(() => validateEnv({ ...base, ...extra })).toThrow(missing),
   );
+  it('accepts Campay with just a permanent token', () =>
+    expect(() =>
+      validateEnv({ ...base, PAYMENT_PROVIDER: 'CAMPAY', CAMPAY_PERMANENT_TOKEN: 't' }),
+    ).not.toThrow());
   it('accepts a fully configured Twilio driver', () =>
     expect(() =>
       validateEnv({

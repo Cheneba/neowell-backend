@@ -7,8 +7,10 @@ import {
 
 export interface CampayConfig {
   baseUrl: string;
-  username: string;
-  password: string;
+  /** Either a permanent access token, or an app username + password. */
+  permanentToken?: string;
+  username?: string;
+  password?: string;
 }
 
 type FetchLike = typeof fetch;
@@ -66,6 +68,7 @@ export class CampayPaymentGateway extends PaymentGateway {
   }
 
   private async getToken(): Promise<string> {
+    if (this.cfg.permanentToken) return this.cfg.permanentToken;
     if (this.token && this.token.expiresAt > Date.now()) return this.token.value;
     const res = await this.fetchImpl(`${this.cfg.baseUrl}/token/`, {
       method: 'POST',
