@@ -7,6 +7,7 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from '../src/app.module';
 import { JobsService } from '../src/jobs/jobs.service';
+import { EmailMessage, EmailService } from '../src/notifications/email.service';
 import { SmsService } from '../src/notifications/sms.service';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { setupApp } from '../src/setup-app';
@@ -19,6 +20,14 @@ export class CapturingSms extends SmsService {
     this.all.push({ phone, message });
     const code = message.match(/\b\d{6}\b/);
     if (code) this.last.set(phone, code[0]);
+  }
+}
+
+/** Captures outgoing email so tests can check who was told what. */
+export class CapturingEmail extends EmailService {
+  sent: EmailMessage[] = [];
+  async send(message: EmailMessage) {
+    this.sent.push(message);
   }
 }
 
@@ -39,6 +48,7 @@ export interface Harness {
   prisma: PrismaService;
   jobs: JobsService;
   sms: CapturingSms;
+  emails: CapturingEmail;
   http: () => ReturnType<typeof request>;
   login: (phone: string, role?: 'CAREGIVER' | 'CLINICIAN') => Promise<string>;
   newPhone: () => string;
@@ -52,9 +62,12 @@ export { PAYMENTS_SECRET };
 export async function createHarness(): Promise<Harness> {
   const stt = await startFakeStt();
   const sms = new CapturingSms();
+  const emails = new CapturingEmail();
   const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
     .overrideProvider(SmsService)
     .useValue(sms)
+    .overrideProvider(EmailService)
+    .useValue(emails)
     .compile();
   const app = moduleRef.createNestApplication<INestApplication<App>>({ rawBody: true });
   setupApp(app);
@@ -68,10 +81,27 @@ export async function createHarness(): Promise<Harness> {
     prisma: app.get(PrismaService),
     jobs: app.get(JobsService),
     sms,
+    emails,
     http,
     newPhone,
     sign: (body) => createHmac('sha256', PAYMENTS_SECRET).update(body).digest('hex'),
     async login(phone, role) {
+      if (role === 'CLINICIAN') {
+        // Clinicians register on the web dashboard; the app only admits verified ones.
+        await http().post('/auth/web/otp/request').send({ phone }).expect(202);
+        const reg = await http()
+          .post('/auth/web/register')
+          .send({
+            phone,
+            code: sms.last.get(phone),
+            email: `${phone.slice(1)}@doctors.test`,
+            password: 'test-password-123',
+            firstName: 'Test',
+            lastName: 'Doctor',
+          })
+          .expect(201);
+        return reg.body.accessToken as string;
+      }
       await http().post('/auth/otp/request').send({ phone }).expect(202);
       const res = await http()
         .post('/auth/otp/verify')

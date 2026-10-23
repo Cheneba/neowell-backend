@@ -32,9 +32,20 @@
 | Method & path | Who | Request | Response | Serves |
 |---|---|---|---|---|
 | `POST /auth/otp/request` | Public | `{ phone }` (E.164) | `202 { expiresInSeconds }`. `429` on cooldown/limit. | AUTH-01 |
-| `POST /auth/otp/verify` | Public | `{ phone, code, role? }` where role ∈ CAREGIVER/CLINICIAN (new users only) | `{ accessToken, refreshToken, isNewUser }` | AUTH-01, AUTH-03 |
+| `POST /auth/otp/verify` | Public | `{ phone, code, role? }` where role ∈ CAREGIVER/CLINICIAN (new users only) | `{ accessToken, refreshToken, isNewUser }`. Mobile: `403 CLINICIAN_REGISTER_ON_WEB` when a new account asks for CLINICIAN; `403 CLINICIAN_NOT_VERIFIED` for a clinician who is not VERIFIED. | AUTH-01, AUTH-03 |
 | `POST /auth/refresh` | Public | `{ refreshToken }` | New token pair (rotation; reuse revokes all) | AUTH-02 |
 | `POST /auth/logout` | Public | `{ refreshToken }` | `204` | AUTH-04 |
+
+**Web dashboard auth** (clinicians and admins only; the app keeps using the OTP routes above):
+
+| Method & path | Who | Request | Response |
+|---|---|---|---|
+| `POST /auth/web/otp/request` | Public | `{ phone }` | `202`. Same SMS code and cooldown as the app. |
+| `POST /auth/web/otp/verify` | Public | `{ phone, code }` | Token pair. `401` unless the number belongs to an active clinician or admin (never creates accounts). Unverified clinicians can sign in, to finish onboarding. |
+| `POST /auth/web/login` | Public | `{ email, password }` | Token pair. `401` on any mismatch, caregiver or inactive account. |
+| `POST /auth/web/register` | Public | `{ phone, code, email, password (10–128), firstName, lastName, locale? }` | `201` token pair; creates a CLINICIAN. `409` when the phone or email exists. |
+| `POST /auth/web/password/reset` | Public | `{ phone, code, newPassword }` | `204`; signs out every session. |
+| `PUT /auth/web/credentials` | D, A | `{ currentPassword?, newPassword, email? }` | `204`. `currentPassword` is required once a password exists. |
 
 ### 2.2 Me (account) — FR-ACC
 
@@ -121,6 +132,7 @@ The public clinician object (never contains phone or email):
 | `GET /clinicians/me` | D | — | Own profile + `documents[]`, `missingDocuments[]`, `missingForReview[]`, `photoUrl` | CLIN-01..02 |
 | `PATCH /clinicians/me` | D | Same fields as create, all optional | Own profile | CLIN-01, CLIN-07 |
 | `POST /clinicians/me/photo` | D | multipart image | `{ photoUrl }` | CLIN-01 |
+| `POST /clinicians/me/submit` | D | — | Own profile → PENDING_REVIEW (e.g. after fixing a rejection). `400` when anything is missing. Emails the admins. | CLIN-02 |
 | `POST /clinicians/me/documents` | D | multipart `type` + `file` (PDF/JPEG/PNG ≤ 10 MB) | `201` document; profile → PENDING_REVIEW when photo + 3 documents are present | CLIN-02 |
 | `PUT /clinicians/me/availability` | D | `{ slots[{dayOfWeek,startMinute,endMinute}] }` | Availability[] | CLIN-04 |
 | `PUT /clinicians/me/available-now` | D | `{ minutes }` (0 switches off, max 240) | `{ availableNowUntil }` | CLIN-04 |
@@ -171,6 +183,7 @@ The consultation object (participants):
 | `GET /admin/payouts` | A | `?status=PENDING` | Payout[] with clinician name and payout number | ADM-03 |
 | `POST /admin/payouts/:id/mark-paid` | A | `{ reference }` | Payout | ADM-03 |
 | `GET /admin/stats` | A | — | `{ users{caregivers, clinicians}, babies, checks{GREEN,YELLOW,RED}, consultations{byStatus}, revenueXaf{gross, commission} }` | ADM-05 |
+| `GET /admin/system` | A | — | `{ database, uptimeSeconds, nodeVersion, memoryMb, jobs{QUEUED,RUNNING,DONE,FAILED}, oldestQueuedAt, failedByQueue }` | NFR-OBS-01 |
 | `GET /admin/jobs` | A | `?status=FAILED` | Job[] | NFR-OBS-01 |
 
 ### 2.13 Files, calls, webhooks, health
