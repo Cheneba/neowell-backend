@@ -66,6 +66,11 @@ export class AdminController {
     return this.admin.stats();
   }
 
+  @Get('system')
+  system() {
+    return this.admin.system();
+  }
+
   @Get('jobs')
   jobs(@Query() q: JobsQuery) {
     return this.admin.jobs(q.status);

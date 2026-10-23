@@ -4,6 +4,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Env } from '../config/env';
 import { FilesService } from '../files/files.service';
 import { Prisma } from '../generated/prisma/client';
 import {
@@ -11,6 +13,7 @@ import {
   ConsultationStatus,
   VerificationStatus,
 } from '../generated/prisma/enums';
+import { NotificationsService } from '../notifications/notifications.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { StorageService } from '../storage/storage.service';
 import { freeSlots } from '../consultations/scheduling';
@@ -35,6 +38,8 @@ export class CliniciansService {
     private readonly prisma: PrismaService,
     private readonly storage: StorageService,
     private readonly files: FilesService,
+    private readonly notifications: NotificationsService,
+    private readonly config: ConfigService<Env, true>,
   ) {}
 
   async register(userId: string, dto: RegisterClinicianDto) {
@@ -175,21 +180,60 @@ export class CliniciansService {
   private async maybeQueueForReview(clinicianId: string) {
     const profile = await this.prisma.clinicianProfile.findUniqueOrThrow({
       where: { id: clinicianId },
-      include: { documents: { select: { type: true } } },
+      include: {
+        documents: { select: { type: true } },
+        user: { select: { firstName: true, lastName: true } },
+      },
     });
     const complete =
       !!profile.photoKey &&
       REQUIRED_DOCUMENTS.every((t) => profile.documents.some((d) => d.type === t));
     if (
-      complete &&
-      (profile.verificationStatus === VerificationStatus.PENDING_DOCUMENTS ||
-        profile.verificationStatus === VerificationStatus.REJECTED)
+      !complete ||
+      (profile.verificationStatus !== VerificationStatus.PENDING_DOCUMENTS &&
+        profile.verificationStatus !== VerificationStatus.REJECTED)
     ) {
-      await this.prisma.clinicianProfile.update({
-        where: { id: profile.id },
-        data: { verificationStatus: VerificationStatus.PENDING_REVIEW, verificationNote: null },
+      return false;
+    }
+    // Conditional update so two concurrent uploads queue (and notify) only once.
+    const { count } = await this.prisma.clinicianProfile.updateMany({
+      where: { id: profile.id, verificationStatus: profile.verificationStatus },
+      data: { verificationStatus: VerificationStatus.PENDING_REVIEW, verificationNote: null },
+    });
+    if (count === 0) return false;
+    await this.notifications.notify({
+      userId: profile.userId,
+      type: 'CLINICIAN_IN_REVIEW',
+      email: true,
+    });
+    const admins = await this.prisma.user.findMany({
+      where: { role: 'ADMIN', isActive: true },
+      select: { id: true },
+    });
+    const name =
+      `${profile.title} ${profile.user.firstName ?? ''} ${profile.user.lastName ?? ''}`.trim();
+    const url = `${this.config.get('DASHBOARD_URL', { infer: true })}/admin/clinicians`;
+    for (const a of admins) {
+      await this.notifications.notify({
+        userId: a.id,
+        type: 'ADMIN_REVIEW_NEEDED',
+        params: { name, url },
+        email: true,
       });
     }
+    return true;
+  }
+
+  /** Explicit "submit for review" (e.g. after fixing the profile following a rejection). */
+  async submitForReview(userId: string) {
+    const profile = await this.requireProfile(userId);
+    if (!(await this.maybeQueueForReview(profile.id))) {
+      const me = await this.myProfile(userId);
+      if (me.missingForReview.length)
+        throw new BadRequestException(`Missing: ${me.missingForReview.join(', ')}`);
+      throw new BadRequestException(`Cannot submit while ${me.verificationStatus}`);
+    }
+    return this.myProfile(userId);
   }
 
   async setAvailability(userId: string, dto: SetAvailabilityDto) {

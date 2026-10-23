@@ -10,6 +10,8 @@ export const envSchema = z.object({
   PORT: z.coerce.number().int().positive().default(3000),
   CORS_ORIGINS: z.string().default('*'),
   PUBLIC_BASE_URL: z.string().url().default('http://localhost:3000'),
+  /** Public URL of the web dashboard, used in emails to admins. */
+  DASHBOARD_URL: z.string().url().default('http://localhost:3001'),
 
   DATABASE_URL: z.string().url(),
 

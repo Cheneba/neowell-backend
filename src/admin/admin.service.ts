@@ -62,11 +62,46 @@ export class AdminService {
         ...(dto.decision === 'VERIFIED' ? {} : { availableNowUntil: null }),
       },
     });
-    if (dto.decision !== 'SUSPENDED') {
+    const type = {
+      VERIFIED: 'CLINICIAN_VERIFIED',
+      REJECTED: 'CLINICIAN_REJECTED',
+      SUSPENDED: 'CLINICIAN_SUSPENDED',
+    }[dto.decision];
+    await this.notifications.notify({
+      userId: profile.userId,
+      type,
+      params: { note: dto.note ?? '' },
+      email: true,
+    });
+    if (dto.decision === 'SUSPENDED') {
+      // Ends app sessions now; the clinician can still sign in on the web to see why.
+      await this.prisma.refreshToken.updateMany({
+        where: { userId: profile.userId, revokedAt: null },
+        data: { revokedAt: new Date() },
+      });
+    }
+    // Keep the other admins in the loop.
+    const [actor, subject, others] = await Promise.all([
+      this.prisma.user.findUnique({
+        where: { id: adminId },
+        select: { firstName: true, lastName: true },
+      }),
+      this.prisma.user.findUnique({
+        where: { id: profile.userId },
+        select: { firstName: true, lastName: true },
+      }),
+      this.prisma.user.findMany({
+        where: { role: 'ADMIN', isActive: true, id: { not: adminId } },
+        select: { id: true },
+      }),
+    ]);
+    const full = (u: { firstName: string | null; lastName: string | null } | null) =>
+      `${u?.firstName ?? ''} ${u?.lastName ?? ''}`.trim() || '—';
+    for (const a of others) {
       await this.notifications.notify({
-        userId: profile.userId,
-        type: dto.decision === 'VERIFIED' ? 'CLINICIAN_VERIFIED' : 'CLINICIAN_REJECTED',
-        params: { note: dto.note ?? '' },
+        userId: a.id,
+        type: 'ADMIN_CLINICIAN_DECISION',
+        params: { admin: full(actor), name: full(subject), status: dto.decision },
         email: true,
       });
     }
@@ -139,6 +174,38 @@ export class AdminService {
       checks: toMap(checks, 'riskLevel'),
       consultations: toMap(consultations, 'status'),
       revenueXaf: { gross: revenue._sum.feeXaf ?? 0, commission: revenue._sum.commissionXaf ?? 0 },
+    };
+  }
+
+  /** Operational health for the dashboard: database, job queue, process. */
+  async system() {
+    const [jobCounts, oldest, failedByQueue, dbUp] = await Promise.all([
+      this.prisma.job.groupBy({ by: ['status'], _count: { _all: true } }),
+      this.prisma.job.findFirst({
+        where: { status: JobStatus.QUEUED },
+        orderBy: { createdAt: 'asc' },
+        select: { createdAt: true },
+      }),
+      this.prisma.job.groupBy({
+        by: ['queue'],
+        where: { status: JobStatus.FAILED },
+        _count: { _all: true },
+      }),
+      this.prisma.$queryRaw`SELECT 1`.then(
+        () => true,
+        () => false,
+      ),
+    ]);
+    const jobs: Record<string, number> = { QUEUED: 0, RUNNING: 0, DONE: 0, FAILED: 0 };
+    for (const r of jobCounts) jobs[r.status] = r._count._all;
+    return {
+      database: dbUp ? 'up' : 'down',
+      uptimeSeconds: Math.round(process.uptime()),
+      nodeVersion: process.version,
+      memoryMb: Math.round(process.memoryUsage().rss / 1024 / 1024),
+      jobs,
+      oldestQueuedAt: oldest?.createdAt ?? null,
+      failedByQueue: Object.fromEntries(failedByQueue.map((r) => [r.queue, r._count._all])),
     };
   }
 

@@ -92,6 +92,13 @@ export class CliniciansController {
     return this.clinicians.uploadDocument(user.id, dto.type, file);
   }
 
+  /** Send a complete profile (photo + all documents) to the admins for verification. */
+  @Post('me/submit')
+  @Roles(Role.CLINICIAN)
+  submit(@CurrentUser() user: AuthUser) {
+    return this.clinicians.submitForReview(user.id);
+  }
+
   @Put('me/availability')
   @Roles(Role.CLINICIAN)
   setAvailability(@CurrentUser() user: AuthUser, @Body() dto: SetAvailabilityDto) {

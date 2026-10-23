@@ -111,16 +111,50 @@ export const TEMPLATES: Record<string, { en: T; fr: T }> = {
   CLINICIAN_VERIFIED: {
     en: {
       title: 'You are verified',
-      body: 'Mothers can now book consultations with you on NeoWell.',
+      body: 'You can now sign in to the NeoWell app. Mothers can book consultations with you.',
     },
     fr: {
       title: 'Vous êtes vérifié(e)',
-      body: 'Les mères peuvent maintenant réserver des consultations avec vous.',
+      body: 'Vous pouvez maintenant vous connecter à l’application NeoWell. Les mères peuvent réserver des consultations avec vous.',
     },
   },
   CLINICIAN_REJECTED: {
     en: { title: 'Verification not approved', body: '{note}' },
     fr: { title: 'Vérification non approuvée', body: '{note}' },
+  },
+  CLINICIAN_IN_REVIEW: {
+    en: {
+      title: 'Documents received',
+      body: 'Your profile is now with our team for verification. We will email you the result.',
+    },
+    fr: {
+      title: 'Documents reçus',
+      body: 'Votre profil est en cours de vérification par notre équipe. Vous recevrez le résultat par e-mail.',
+    },
+  },
+  CLINICIAN_SUSPENDED: {
+    en: {
+      title: 'Account suspended',
+      body: 'Your clinician profile was suspended. {note}',
+    },
+    fr: {
+      title: 'Compte suspendu',
+      body: 'Votre profil de clinicien a été suspendu. {note}',
+    },
+  },
+  ADMIN_REVIEW_NEEDED: {
+    en: {
+      title: 'Clinician waiting for review',
+      body: '{name} submitted their documents. Review: {url}',
+    },
+    fr: {
+      title: 'Clinicien en attente de vérification',
+      body: '{name} a soumis ses documents. À vérifier : {url}',
+    },
+  },
+  ADMIN_CLINICIAN_DECISION: {
+    en: { title: 'Clinician status changed', body: '{admin} set {name} to {status}.' },
+    fr: { title: 'Statut d’un clinicien modifié', body: '{admin} a passé {name} au statut {status}.' },
   },
   PAYOUT_CREATED: {
     en: {
