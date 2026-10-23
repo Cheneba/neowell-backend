@@ -1,6 +1,7 @@
 /**
  * Seeds an admin account and, outside production, one clearly-fake demo facility.
  *   SEED_ADMIN_PHONE=+2376XXXXXXXX npm run db:seed
+ * Add SEED_ADMIN_EMAIL + SEED_ADMIN_PASSWORD (10+ chars) to also enable email/password login on the web dashboard.
  * With SEED_DEMO_CLINICIAN_PHONE set (development only), also creates a verified demo doctor
  * who is available all week and "available now", so consultations can be tried end to end
  * with the sandbox payment provider.
@@ -8,6 +9,7 @@
  */
 import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
+import { hashPassword } from '../src/auth/password';
 import { PrismaClient } from '../src/generated/prisma/client';
 
 const prisma = new PrismaClient({
@@ -17,10 +19,22 @@ const prisma = new PrismaClient({
 async function main() {
   const adminPhone = process.env.SEED_ADMIN_PHONE;
   if (adminPhone) {
+    // Optional web-dashboard email/password login for the admin.
+    const email = process.env.SEED_ADMIN_EMAIL?.trim().toLowerCase();
+    const password = process.env.SEED_ADMIN_PASSWORD;
+    if (!!email !== !!password)
+      throw new Error('Set both SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD');
+    const login = email && password ? { email, passwordHash: await hashPassword(password) } : {};
     await prisma.user.upsert({
       where: { phone: adminPhone },
-      update: { role: 'ADMIN' },
-      create: { phone: adminPhone, role: 'ADMIN', firstName: 'NeoWell', lastName: 'Admin' },
+      update: { role: 'ADMIN', ...login },
+      create: {
+        phone: adminPhone,
+        role: 'ADMIN',
+        firstName: 'NeoWell',
+        lastName: 'Admin',
+        ...login,
+      },
     });
     console.log(`Admin ready: ${adminPhone}`);
   } else {

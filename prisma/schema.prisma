@@ -25,16 +25,18 @@ enum Locale {
 }
 
 model User {
-  id        String  @id @default(uuid())
-  phone     String  @unique // E.164, e.g. +2376XXXXXXXX. Never exposed to the other party of a consultation.
-  email     String? @unique
-  firstName String?
-  lastName  String? // Used for the hospital naming convention "Baby <lastName>"
-  role      Role    @default(CAREGIVER)
-  locale    Locale  @default(en)
-  region    String?
-  city      String?
-  isActive  Boolean @default(true)
+  id           String  @id @default(uuid())
+  phone        String  @unique // E.164, e.g. +2376XXXXXXXX. Never exposed to the other party of a consultation.
+  email        String? @unique
+  /// scrypt hash for web-dashboard email/password login (clinicians and admins only). Mobile stays OTP-only.
+  passwordHash String?
+  firstName    String?
+  lastName     String? // Used for the hospital naming convention "Baby <lastName>"
+  role         Role    @default(CAREGIVER)
+  locale       Locale  @default(en)
+  region       String?
+  city         String?
+  isActive     Boolean @default(true)
 
   // Explicit consent timestamps (null = not given). PDR §9.
   consentDataCollectionAt DateTime?
@@ -733,12 +735,12 @@ model DoseLog {
 // ═════════════════════════════ Notifications ═════════════════════════════════
 
 model Device {
-  id            String   @id @default(uuid())
-  userId        String
-  pushToken     String   @unique // FCM or Expo token, whichever PUSH_DRIVER issues
-  platform      String // android | ios | web
-  lastSeenAt    DateTime @default(now())
-  createdAt     DateTime @default(now())
+  id         String   @id @default(uuid())
+  userId     String
+  pushToken  String   @unique // FCM or Expo token, whichever PUSH_DRIVER issues
+  platform   String // android | ios | web
+  lastSeenAt DateTime @default(now())
+  createdAt  DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
