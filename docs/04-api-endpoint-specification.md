@@ -136,6 +136,7 @@ The public clinician object (never contains phone or email):
 | `POST /clinicians/me/documents` | D | multipart `type` + `file` (PDF/JPEG/PNG ≤ 10 MB) | `201` document (uploading the same type again replaces it); does not start review | CLIN-02 |
 | `PUT /clinicians/me/availability` | D | `{ slots[{dayOfWeek,startMinute,endMinute}] }` | Availability[] | CLIN-04 |
 | `PUT /clinicians/me/available-now` | D | `{ minutes }` (0 switches off, max 240) | `{ availableNowUntil }` | CLIN-04 |
+| `GET /clinicians/me/stats` | D | — | `{ byStatus{}, completedByMedium{}, completedLast30Days, ratingAvg, ratingCount }` (web dashboard home) | CLIN-06 |
 | `GET /clinicians/me/earnings` | D | — | `{ pendingXaf, paidXaf, completedCount, payouts[] }` | CLIN-06, CONS-14 |
 
 ### 2.10 Consultations — FR-CONS

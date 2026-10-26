@@ -274,6 +274,35 @@ export class CliniciansService {
     return { availableNowUntil };
   }
 
+  /** Counts for the web dashboard's home page: consultations by status and medium, and the rating. */
+  async stats(userId: string) {
+    const profile = await this.requireProfile(userId);
+    const since = new Date(Date.now() - 30 * 86_400_000);
+    const where = { clinicianId: profile.id };
+    const [byStatus, completedByMedium, completedLast30Days] = await Promise.all([
+      this.prisma.consultation.groupBy({ by: ['status'], where, _count: { _all: true } }),
+      this.prisma.consultation.groupBy({
+        by: ['medium'],
+        where: { ...where, status: 'COMPLETED' },
+        _count: { _all: true },
+      }),
+      this.prisma.consultation.count({
+        where: { ...where, status: 'COMPLETED', endedAt: { gte: since } },
+      }),
+    ]);
+    const count = <K extends string>(
+      rows: ({ _count: { _all: number } } & Record<K, string>)[],
+      key: K,
+    ) => Object.fromEntries(rows.map((r) => [r[key], r._count._all]));
+    return {
+      byStatus: count(byStatus, 'status'),
+      completedByMedium: count(completedByMedium, 'medium'),
+      completedLast30Days,
+      ratingAvg: profile.ratingAvg === null ? null : Number(profile.ratingAvg),
+      ratingCount: profile.ratingCount,
+    };
+  }
+
   async earnings(userId: string) {
     const profile = await this.requireProfile(userId);
     const earned = {

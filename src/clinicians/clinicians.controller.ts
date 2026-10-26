@@ -118,6 +118,12 @@ export class CliniciansController {
   }
 
   @Get(':id')
+  @Get('me/stats')
+  @Roles(Role.CLINICIAN)
+  stats(@CurrentUser() user: AuthUser) {
+    return this.clinicians.stats(user.id);
+  }
+
   get(@Param('id', ParseUUIDPipe) id: string) {
     return this.clinicians.getVerified(id);
   }

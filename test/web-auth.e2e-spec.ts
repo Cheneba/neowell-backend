@@ -200,6 +200,9 @@ describe('NeoWell API — web dashboard auth & verification (e2e)', () => {
       .expect(201);
     await h.jobs.drain();
 
+    const stats = await h.http().get('/clinicians/me/stats').set(auth(token)).expect(200);
+    expect(stats.body).toMatchObject({ completedLast30Days: 0, ratingAvg: null, ratingCount: 0 });
+
     // Now the app lets them in.
     await requestOtp('/auth/otp/request', phone);
     await h
