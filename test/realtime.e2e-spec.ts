@@ -17,7 +17,7 @@ describe('Realtime websocket (e2e)', () => {
   beforeAll(async () => {
     h = await createHarness();
     await h.app.listen(0, '127.0.0.1');
-    url = `ws://127.0.0.1:${((h.app.getHttpServer() as unknown as import("node:http").Server).address() as AddressInfo).port}/ws`;
+    url = `ws://127.0.0.1:${((h.app.getHttpServer() as unknown as import('node:http').Server).address() as AddressInfo).port}/ws`;
   });
   afterAll(() => h.close());
 

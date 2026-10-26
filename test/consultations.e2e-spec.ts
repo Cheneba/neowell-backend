@@ -687,7 +687,7 @@ describe('NeoWell API — clinicians & consultations (e2e)', () => {
         .http()
         .post('/me/devices')
         .set(auth(mother))
-        .send({ pushToken: "fcm-test-device-token-0001", platform: 'android' })
+        .send({ pushToken: 'fcm-test-device-token-0001', platform: 'android' })
         .expect(201);
       await h.prisma.recheck.update({
         where: { id: r.body.recheck.id },
