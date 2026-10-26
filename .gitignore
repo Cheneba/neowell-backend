@@ -3,6 +3,7 @@ dist/
 coverage/
 src/generated/
 uploads/
+logs/
 .env*
 !.env.example
 *.log

@@ -3,14 +3,16 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { FileLogger } from './common/file-logger';
 import { Env } from './config/env';
 import { setupApp } from './setup-app';
 
 async function bootstrap() {
   // rawBody: webhook signatures are computed over the exact bytes received.
-  const app = await NestFactory.create(AppModule, { rawBody: true });
-  setupApp(app);
+  const app = await NestFactory.create(AppModule, { rawBody: true, bufferLogs: true });
   const config = app.get<ConfigService<Env, true>>(ConfigService);
+  app.useLogger(new FileLogger(config.get('LOG_DIR', { infer: true })));
+  setupApp(app);
 
   if (config.get('NODE_ENV', { infer: true }) !== 'production') {
     const doc = new DocumentBuilder()

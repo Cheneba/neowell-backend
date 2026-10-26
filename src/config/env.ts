@@ -81,6 +81,8 @@ export const envSchema = z.object({
     .default('true')
     .transform((v) => v === 'true'),
   JOBS_POLL_MS: z.coerce.number().int().min(200).default(2000),
+
+  LOG_DIR: z.string().default('logs'),
 });
 
 export type Env = z.infer<typeof envSchema>;
