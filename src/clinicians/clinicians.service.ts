@@ -137,7 +137,6 @@ export class CliniciansService {
       data: { photoKey: key },
     });
     if (profile.photoKey) await this.storage.delete([profile.photoKey]);
-    await this.maybeQueueForReview(profile.id);
     return { photoUrl: this.files.url(key, detected) };
   }
 
@@ -172,11 +171,10 @@ export class CliniciansService {
       },
       select: { id: true, type: true, originalName: true, uploadedAt: true },
     });
-    await this.maybeQueueForReview(profile.id);
     return doc;
   }
 
-  /** Photo + all three documents → PENDING_REVIEW (from PENDING_DOCUMENTS or REJECTED). */
+  /** Photo + all three documents → PENDING_REVIEW (from PENDING_DOCUMENTS or REJECTED). Only on an explicit submit, so uploads can still be replaced first. */
   private async maybeQueueForReview(clinicianId: string) {
     const profile = await this.prisma.clinicianProfile.findUniqueOrThrow({
       where: { id: clinicianId },

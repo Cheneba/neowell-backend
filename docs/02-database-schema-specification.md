@@ -93,7 +93,7 @@ AWAITING_PAYMENT ──pay ok──▶ REQUESTED ──accept──▶ CONFIRMED
 
 **Payment status** (`Consultation.paymentStatus`): `UNPAID → PENDING → PAID → (REFUND_PENDING → REFUNDED)`, or `PENDING → FAILED → (retry) PENDING`.
 
-**Clinician verification**: `PENDING_DOCUMENTS → (3 documents) PENDING_REVIEW → VERIFIED | REJECTED`. `REJECTED → (re-upload) PENDING_REVIEW`. Any status → `SUSPENDED` (admin).
+**Clinician verification**: `PENDING_DOCUMENTS → (photo + 3 documents, then the doctor submits) PENDING_REVIEW → VERIFIED | REJECTED`. `REJECTED → (fix, then submit again) PENDING_REVIEW`. Any status → `SUSPENDED` (admin).
 
 **Recheck**: `PENDING → DONE | MISSED`.
 

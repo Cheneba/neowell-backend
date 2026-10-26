@@ -158,10 +158,25 @@ describe('NeoWell API — web dashboard auth & verification (e2e)', () => {
       .set(auth(token))
       .attach('file', PNG, { filename: 'me.png', contentType: 'image/png' })
       .expect(201);
+    // Replacing an upload is fine, and nothing is queued until the doctor submits.
+    await h
+      .http()
+      .post('/clinicians/me/photo')
+      .set(auth(token))
+      .attach('file', PNG, { filename: 'me2.png', contentType: 'image/png' })
+      .expect(201);
+    await h.jobs.drain();
+    expect(h.emails.sent.filter((m) => m.to === adminEmail && m.text.includes('Ada'))).toHaveLength(
+      0,
+    );
+    expect((await h.http().get('/clinicians/me').set(auth(token))).body.verificationStatus).toBe(
+      'PENDING_DOCUMENTS',
+    );
+    await h.http().post('/clinicians/me/submit').set(auth(token)).expect(201);
     await h.jobs.drain();
     const me = await h.http().get('/clinicians/me').set(auth(token)).expect(200);
     expect(me.body.verificationStatus).toBe('PENDING_REVIEW');
-    // Queued once, not once per upload.
+    // Queued once, however many times it was uploaded.
     expect(h.emails.sent.filter((m) => m.to === email)).toHaveLength(1);
     expect(h.emails.sent.filter((m) => m.to === adminEmail && m.text.includes('Ada'))).toHaveLength(
       1,

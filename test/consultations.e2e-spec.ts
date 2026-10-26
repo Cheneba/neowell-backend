@@ -140,6 +140,11 @@ describe('NeoWell API — clinicians & consultations (e2e)', () => {
         .set(auth(doctor))
         .send({
           slots: [
+      // Uploading is not enough: review starts only when the doctor submits.
+      expect((await h.http().get('/clinicians/me').set(auth(doctor))).body.verificationStatus).toBe(
+        'PENDING_DOCUMENTS',
+      );
+      await h.http().post('/clinicians/me/submit').set(auth(doctor)).expect(201);
             { dayOfWeek: 1, startMinute: 540, endMinute: 600 },
             { dayOfWeek: 1, startMinute: 560, endMinute: 620 },
           ],
