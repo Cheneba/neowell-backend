@@ -40,7 +40,7 @@
 
 | Method & path | Who | Request | Response |
 |---|---|---|---|
-| `POST /auth/web/otp/request` | Public | `{ phone }` | `202`. Same SMS code and cooldown as the app. |
+| `POST /auth/web/otp/request` | Public | `{ phone, channel?: "sms" \| "email", email? }` | `202`. Same code and cooldown as the app. For sign-up only, `channel: "email"` + `email` delivers the code to that address, and only while the phone has no account and the email is unused; otherwise nothing is sent and the answer is the same. |
 | `POST /auth/web/otp/verify` | Public | `{ phone, code }` | Token pair. `401` unless the number belongs to an active clinician or admin (never creates accounts). Unverified clinicians can sign in, to finish onboarding. |
 | `POST /auth/web/login` | Public | `{ email, password }` | Token pair. `401` on any mismatch, caregiver or inactive account. |
 | `POST /auth/web/register` | Public | `{ phone, code, email, password (10–128), firstName, lastName, locale? }` | `201` token pair; creates a CLINICIAN. `409` when the phone or email exists. |

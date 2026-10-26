@@ -16,6 +16,7 @@ import {
   WebLoginDto,
   WebRegisterDto,
   WebResetPasswordDto,
+  WebRequestOtpDto,
   WebVerifyOtpDto,
 } from './dto/auth.dto';
 import { OtpService } from './otp.service';
@@ -66,8 +67,8 @@ export class AuthController {
   @Public()
   @Post('web/otp/request')
   @HttpCode(HttpStatus.ACCEPTED)
-  webRequestOtp(@Body() dto: RequestOtpDto) {
-    return this.otp.request(dto.phone);
+  webRequestOtp(@Body() dto: WebRequestOtpDto) {
+    return this.auth.webRequestOtp(dto);
   }
 
   /** Phone + OTP sign-in for an existing clinician or admin. */

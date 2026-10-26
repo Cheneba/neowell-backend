@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@n
 import { ConfigService } from '@nestjs/config';
 import { createHmac, randomInt, timingSafeEqual } from 'node:crypto';
 import { Env } from '../config/env';
+import { EmailService } from '../notifications/email.service';
 import { SmsService } from '../notifications/sms.service';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -13,10 +14,12 @@ export class OtpService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly sms: SmsService,
+    private readonly email: EmailService,
     private readonly config: ConfigService<Env, true>,
   ) {}
 
-  async request(phone: string): Promise<{ expiresInSeconds: number }> {
+  /** The code is always tied to the phone; `emailTo` only changes where it is delivered. */
+  async request(phone: string, emailTo?: string): Promise<{ expiresInSeconds: number }> {
     const now = Date.now();
     const recent = await this.prisma.otpCode.findMany({
       where: { phone, createdAt: { gte: new Date(now - 60 * 60 * 1000) } },
@@ -47,10 +50,9 @@ export class OtpService {
     await this.prisma.otpCode.create({
       data: { phone, codeHash: this.hash(phone, code), expiresAt: new Date(now + ttl * 1000) },
     });
-    await this.sms.send(
-      phone,
-      `Your NeoWell code is ${code}. It expires in ${Math.round(ttl / 60)} minutes.`,
-    );
+    const text = `Your NeoWell code is ${code}. It expires in ${Math.round(ttl / 60)} minutes.`;
+    if (emailTo) await this.email.send({ to: emailTo, subject: 'Your NeoWell code', text });
+    else await this.sms.send(phone, text);
     return { expiresInSeconds: ttl };
   }
 

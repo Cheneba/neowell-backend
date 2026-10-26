@@ -51,6 +51,12 @@ export class TokenPairDto {
 
 const PASSWORD_MSG = 'password must be 10–128 characters';
 
+export class WebRequestOtpDto extends RequestOtpDto {
+  /** "email" is for sign-up only: the code goes to `email`, and only while the phone has no account. */
+  @IsOptional() @IsIn(['sms', 'email']) channel?: 'sms' | 'email';
+  @IsOptional() @IsEmail() @MaxLength(200) email?: string;
+}
+
 export class WebVerifyOtpDto {
   @Matches(E164, { message: 'phone must be in E.164 format, e.g. +237670000000' })
   phone: string;

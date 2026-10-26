@@ -18,6 +18,7 @@ import {
   WebCredentialsDto,
   WebLoginDto,
   WebRegisterDto,
+  WebRequestOtpDto,
   WebResetPasswordDto,
   WebVerifyOtpDto,
 } from './dto/auth.dto';
@@ -81,6 +82,23 @@ export class AuthService {
   /** Phone + OTP sign-in for an existing clinician or admin. Never creates an account. */
   async webVerifyOtp(dto: WebVerifyOtpDto): Promise<TokenPairDto> {
     await this.otp.verify(dto.phone, dto.code);
+  /**
+   * Sends a code by SMS, or by email when a sign-up asks for it. The email goes to the address
+   * typed in the form, and only while the phone has no account: otherwise anyone could have a
+   * code for someone else's number delivered to their own inbox and sign in with it. The answer is
+   * the same either way, so this cannot be used to find accounts or addresses.
+   */
+  async webRequestOtp(dto: WebRequestOtpDto): Promise<{ expiresInSeconds: number }> {
+    if (dto.channel !== 'email' || !dto.email) return this.otp.request(dto.phone);
+    const email = dto.email.trim().toLowerCase();
+    const [byPhone, byEmail] = await Promise.all([
+      this.prisma.user.findUnique({ where: { phone: dto.phone } }),
+      this.prisma.user.findFirst({ where: { email: { equals: email, mode: 'insensitive' } } }),
+    ]);
+    if (!byPhone && !byEmail) return this.otp.request(dto.phone, email);
+    return { expiresInSeconds: this.config.get('OTP_TTL_SECONDS', { infer: true }) };
+  }
+
     const user = await this.prisma.user.findUnique({ where: { phone: dto.phone } });
     if (!user || !isWebRole(user.role)) {
       throw new UnauthorizedException('No clinician or admin account for this number');
