@@ -14,6 +14,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { AuthUser } from '../common/auth-user';
+import { AllowUnverified } from '../common/decorators/allow-unverified.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { ClinicianDocumentType, Role } from '../generated/prisma/enums';
@@ -43,18 +44,21 @@ export class CliniciansController {
   // Static routes are declared before `:id` so they are not captured by it.
 
   @Post('me')
+  @AllowUnverified()
   @Roles(Role.CLINICIAN)
   register(@CurrentUser() user: AuthUser, @Body() dto: RegisterClinicianDto) {
     return this.clinicians.register(user.id, dto);
   }
 
   @Get('me')
+  @AllowUnverified()
   @Roles(Role.CLINICIAN)
   me(@CurrentUser() user: AuthUser) {
     return this.clinicians.myProfile(user.id);
   }
 
   @Patch('me')
+  @AllowUnverified()
   @Roles(Role.CLINICIAN)
   update(@CurrentUser() user: AuthUser, @Body() dto: UpdateClinicianDto) {
     return this.clinicians.update(user.id, dto);
@@ -62,6 +66,7 @@ export class CliniciansController {
 
   /** Profile photo — required for verification (trust, FR-CLIN-01). */
   @Post('me/photo')
+  @AllowUnverified()
   @Roles(Role.CLINICIAN)
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
@@ -71,6 +76,7 @@ export class CliniciansController {
 
   /** Upload a medical licence, degree or proof of employment (PDF/JPEG/PNG). */
   @Post('me/documents')
+  @AllowUnverified()
   @Roles(Role.CLINICIAN)
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
@@ -94,6 +100,7 @@ export class CliniciansController {
 
   /** Send a complete profile (photo + all documents) to the admins for verification. */
   @Post('me/submit')
+  @AllowUnverified()
   @Roles(Role.CLINICIAN)
   submit(@CurrentUser() user: AuthUser) {
     return this.clinicians.submitForReview(user.id);
@@ -111,6 +118,12 @@ export class CliniciansController {
     return this.clinicians.setAvailableNow(user.id, dto.minutes);
   }
 
+  @Get('me/stats')
+  @Roles(Role.CLINICIAN)
+  stats(@CurrentUser() user: AuthUser) {
+    return this.clinicians.stats(user.id);
+  }
+
   @Get('me/earnings')
   @Roles(Role.CLINICIAN)
   earnings(@CurrentUser() user: AuthUser) {
@@ -118,12 +131,6 @@ export class CliniciansController {
   }
 
   @Get(':id')
-  @Get('me/stats')
-  @Roles(Role.CLINICIAN)
-  stats(@CurrentUser() user: AuthUser) {
-    return this.clinicians.stats(user.id);
-  }
-
   get(@Param('id', ParseUUIDPipe) id: string) {
     return this.clinicians.getVerified(id);
   }

@@ -236,4 +236,89 @@ describe('NeoWell API — web dashboard auth & verification (e2e)', () => {
       .send({ email: `forgot-${run}@doctors.test`, password: 'brand-new-password' })
       .expect(200);
   });
+  it('can send the sign-up code to the typed email, but never for a number that has an account', async () => {
+    const phone = h.newPhone();
+    const email = `signup-${run}@doctors.test`;
+    await h.prisma.otpCode.deleteMany({ where: { phone } });
+    h.emails.sent.length = 0;
+    await h
+      .http()
+      .post('/auth/web/otp/request')
+      .send({ phone, channel: 'email', email })
+      .expect(202);
+    const code = h.emails.sent.find((m) => m.to === email)?.text.match(/\d{6}/)?.[0];
+    expect(code).toBeDefined();
+    expect(h.sms.last.has(phone)).toBe(false);
+    await h
+      .http()
+      .post('/auth/web/register')
+      .send({
+        phone,
+        code,
+        email,
+        password: 'a-long-password',
+        firstName: 'Ada',
+        lastName: 'Ngu',
+      })
+      .expect(201);
+
+    // The number now has an account: a code for it must not be redirected to another inbox.
+    await h.prisma.otpCode.deleteMany({ where: { phone } });
+    h.emails.sent.length = 0;
+    await h
+      .http()
+      .post('/auth/web/otp/request')
+      .send({ phone, channel: 'email', email: `attacker-${run}@evil.test` })
+      .expect(202);
+    expect(h.emails.sent).toHaveLength(0);
+  });
+
+  it('cuts a suspended clinician off everywhere except their own status, even on an open session', async () => {
+    const phone = h.newPhone();
+    const token = await h.login(phone, 'CLINICIAN');
+    const profile = await h
+      .http()
+      .post('/clinicians/me')
+      .set(auth(token))
+      .send({
+        firstName: 'Ada',
+        lastName: 'Ngu',
+        licenseNumber: `LIC-S-${Date.now()}`,
+        specialties: ['PAEDIATRICS'],
+        feeChatXaf: 2000,
+        feeAudioXaf: 4000,
+        feeVideoXaf: 6000,
+      })
+      .expect(201);
+    await h.prisma.clinicianProfile.update({
+      where: { id: profile.body.id },
+      data: { verificationStatus: 'VERIFIED' },
+    });
+    await h.http().get('/consultations').set(auth(token)).expect(200);
+    expect((await h.http().get('/me').set(auth(token)).expect(200)).body.verificationStatus).toBe(
+      'VERIFIED',
+    );
+
+    await h
+      .http()
+      .post(`/admin/clinicians/${profile.body.id}/review`)
+      .set(auth(adminToken))
+      .send({ decision: 'SUSPENDED', note: 'Licence under investigation' })
+      .expect(201);
+
+    const blocked = await h.http().get('/consultations').set(auth(token)).expect(403);
+    expect(blocked.body.code).toBe('CLINICIAN_SUSPENDED');
+    const me = await h.http().get('/me').set(auth(token)).expect(200);
+    expect(me.body.verificationStatus).toBe('SUSPENDED');
+    expect(me.body.support).toEqual({ email: null, phone: null });
+    await h.http().get('/clinicians/me').set(auth(token)).expect(200);
+
+    await requestOtp('/auth/otp/request', phone);
+    const login = await h
+      .http()
+      .post('/auth/otp/verify')
+      .send({ phone, code: h.sms.last.get(phone) })
+      .expect(403);
+    expect(login.body.code).toBe('CLINICIAN_SUSPENDED');
+  });
 });

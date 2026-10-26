@@ -8,6 +8,7 @@ import { BabiesModule } from './babies/babies.module';
 import { ChecksModule } from './checks/checks.module';
 import { CliniciansModule } from './clinicians/clinicians.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
+import { VerifiedClinicianGuard } from './common/guards/verified-clinician.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { AuditInterceptor } from './common/interceptors/audit.interceptor';
 import { Env, validateEnv } from './config/env';
@@ -63,6 +64,7 @@ import { VoiceModule } from './voice/voice.module';
     { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
+    { provide: APP_GUARD, useClass: VerifiedClinicianGuard },
     { provide: APP_INTERCEPTOR, useClass: AuditInterceptor },
   ],
 })

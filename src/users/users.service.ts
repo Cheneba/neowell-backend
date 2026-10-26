@@ -1,4 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Env } from '../config/env';
 import { Prisma, User } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateConsentsDto, UpdateMeDto } from './dto/user.dto';
@@ -27,10 +29,30 @@ export function presentUser(u: User) {
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly config: ConfigService<Env, true>,
+  ) {}
 
+  /** The profile, plus for clinicians the verification status and how to reach support. */
   async me(userId: string) {
-    return presentUser(await this.prisma.user.findUniqueOrThrow({ where: { id: userId } }));
+    const user = await this.prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+      include: { clinician: { select: { verificationStatus: true } } },
+    });
+    const { clinician, ...rest } = user;
+    return {
+      ...presentUser(rest),
+      ...(user.role === 'CLINICIAN'
+        ? {
+            verificationStatus: clinician?.verificationStatus ?? 'PENDING_DOCUMENTS',
+            support: {
+              email: this.config.get('SUPPORT_EMAIL', { infer: true }) ?? null,
+              phone: this.config.get('SUPPORT_PHONE', { infer: true }) ?? null,
+            },
+          }
+        : {}),
+    };
   }
 
   async update(userId: string, dto: UpdateMeDto) {

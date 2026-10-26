@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Patch, Put } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthUser } from '../common/auth-user';
+import { AllowUnverified } from '../common/decorators/allow-unverified.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '../generated/prisma/enums';
@@ -9,6 +10,7 @@ import { UsersService } from './users.service';
 
 @ApiTags('me')
 @ApiBearerAuth()
+@AllowUnverified()
 @Controller('me')
 export class UsersController {
   constructor(private readonly users: UsersService) {}

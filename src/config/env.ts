@@ -82,6 +82,10 @@ export const envSchema = z.object({
     .transform((v) => v === 'true'),
   JOBS_POLL_MS: z.coerce.number().int().min(200).default(2000),
 
+  // Shown to clinicians who are suspended or not verified.
+  SUPPORT_EMAIL: optional(z.string().email()),
+  SUPPORT_PHONE: optional(z.string()),
+
   LOG_DIR: z.string().default('logs'),
 });
 

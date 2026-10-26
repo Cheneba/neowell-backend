@@ -68,9 +68,12 @@ export class AuthService {
       user.role === Role.CLINICIAN &&
       user.clinician?.verificationStatus !== VerificationStatus.VERIFIED
     ) {
+      const suspended = user.clinician?.verificationStatus === VerificationStatus.SUSPENDED;
       throw new ForbiddenException({
-        code: 'CLINICIAN_NOT_VERIFIED',
-        message: 'Your account is not verified yet. Check your status on the web dashboard',
+        code: suspended ? 'CLINICIAN_SUSPENDED' : 'CLINICIAN_NOT_VERIFIED',
+        message: suspended
+          ? 'Your account is suspended. Contact NeoWell support'
+          : 'Your account is not verified yet. Check your status on the web dashboard',
       });
     }
 
@@ -79,9 +82,6 @@ export class AuthService {
 
   // ── Web dashboard: clinicians and admins only ─────────────────
 
-  /** Phone + OTP sign-in for an existing clinician or admin. Never creates an account. */
-  async webVerifyOtp(dto: WebVerifyOtpDto): Promise<TokenPairDto> {
-    await this.otp.verify(dto.phone, dto.code);
   /**
    * Sends a code by SMS, or by email when a sign-up asks for it. The email goes to the address
    * typed in the form, and only while the phone has no account: otherwise anyone could have a
@@ -99,6 +99,9 @@ export class AuthService {
     return { expiresInSeconds: this.config.get('OTP_TTL_SECONDS', { infer: true }) };
   }
 
+  /** Phone + OTP sign-in for an existing clinician or admin. Never creates an account. */
+  async webVerifyOtp(dto: WebVerifyOtpDto): Promise<TokenPairDto> {
+    await this.otp.verify(dto.phone, dto.code);
     const user = await this.prisma.user.findUnique({ where: { phone: dto.phone } });
     if (!user || !isWebRole(user.role)) {
       throw new UnauthorizedException('No clinician or admin account for this number');

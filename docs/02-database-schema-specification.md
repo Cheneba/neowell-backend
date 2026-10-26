@@ -774,3 +774,7 @@ Who did what, when (FR-AUD). No request bodies.
 | `HomeRemedy` | `conditionId`, `order`, `textEn`, `textFr`, `minAgeDays` |
 
 These tables are added by a later migration together with an import script for the spreadsheet columns: *condition · how identified · can the mother identify it · home or hospital · home remedies · severity*.
+
+### Access while not verified
+
+A clinician whose `verificationStatus` is not `VERIFIED` is refused on every route except those marked `@AllowUnverified()` (`/me`, `/clinicians/me*` onboarding routes, `PUT /auth/web/credentials`). The refusal is `403` with code `CLINICIAN_SUSPENDED` or `CLINICIAN_NOT_VERIFIED`. The status is read on each request, so suspending a clinician cuts off a session that is already open. `GET /me` returns `verificationStatus` and `support: { email, phone }` (from `SUPPORT_EMAIL` and `SUPPORT_PHONE`) so the clients can show a "contact support" screen.

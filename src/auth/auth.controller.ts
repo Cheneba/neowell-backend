@@ -2,6 +2,7 @@ import { Body, Controller, HttpCode, HttpStatus, Post, Put } from '@nestjs/commo
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { AuthUser } from '../common/auth-user';
+import { AllowUnverified } from '../common/decorators/allow-unverified.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Public } from '../common/decorators/public.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -15,8 +16,8 @@ import {
   WebCredentialsDto,
   WebLoginDto,
   WebRegisterDto,
-  WebResetPasswordDto,
   WebRequestOtpDto,
+  WebResetPasswordDto,
   WebVerifyOtpDto,
 } from './dto/auth.dto';
 import { OtpService } from './otp.service';
@@ -102,6 +103,7 @@ export class AuthController {
   }
 
   /** Set or change the password (and email) of the signed-in clinician or admin. */
+  @AllowUnverified()
   @Put('web/credentials')
   @ApiBearerAuth()
   @Roles(Role.CLINICIAN, Role.ADMIN)

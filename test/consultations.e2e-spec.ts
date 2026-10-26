@@ -97,18 +97,6 @@ describe('NeoWell API — clinicians & consultations (e2e)', () => {
         'EMPLOYMENT_PROOF',
         'PHOTO',
       ]);
-      await h
-        .http()
-        .put('/clinicians/me/availability')
-        .set(auth(doctor))
-        .send({
-          slots: [0, 1, 2, 3, 4, 5, 6].map((d) => ({
-            dayOfWeek: d,
-            startMinute: 0,
-            endMinute: 1440,
-          })),
-        })
-        .expect(200);
     });
 
     it('rejects files whose content does not match the declared type', async () => {
@@ -133,24 +121,6 @@ describe('NeoWell API — clinicians & consultations (e2e)', () => {
         .expect(400);
     });
 
-    it('rejects overlapping availability slots', () =>
-      h
-        .http()
-        .put('/clinicians/me/availability')
-        .set(auth(doctor))
-        .send({
-          slots: [
-      // Uploading is not enough: review starts only when the doctor submits.
-      expect((await h.http().get('/clinicians/me').set(auth(doctor))).body.verificationStatus).toBe(
-        'PENDING_DOCUMENTS',
-      );
-      await h.http().post('/clinicians/me/submit').set(auth(doctor)).expect(201);
-            { dayOfWeek: 1, startMinute: 540, endMinute: 600 },
-            { dayOfWeek: 1, startMinute: 560, endMinute: 620 },
-          ],
-        })
-        .expect(400));
-
     it('needs a photo and the three documents before review', async () => {
       for (const type of ['MEDICAL_LICENSE', 'MEDICAL_DEGREE', 'EMPLOYMENT_PROOF']) {
         await h
@@ -170,6 +140,11 @@ describe('NeoWell API — clinicians & consultations (e2e)', () => {
         .set(auth(doctor))
         .attach('file', PNG, { filename: 'me.png', contentType: 'image/png' })
         .expect(201);
+      // Uploading is not enough: review starts only when the doctor submits.
+      expect((await h.http().get('/clinicians/me').set(auth(doctor))).body.verificationStatus).toBe(
+        'PENDING_DOCUMENTS',
+      );
+      await h.http().post('/clinicians/me/submit').set(auth(doctor)).expect(201);
       expect((await h.http().get('/clinicians/me').set(auth(doctor))).body.verificationStatus).toBe(
         'PENDING_REVIEW',
       );
@@ -196,7 +171,33 @@ describe('NeoWell API — clinicians & consultations (e2e)', () => {
         .set(auth(admin))
         .send({ decision: 'VERIFIED' })
         .expect(201);
+      // Only a verified clinician can run their schedule.
+      await h
+        .http()
+        .put('/clinicians/me/availability')
+        .set(auth(doctor))
+        .send({
+          slots: [0, 1, 2, 3, 4, 5, 6].map((d) => ({
+            dayOfWeek: d,
+            startMinute: 0,
+            endMinute: 1440,
+          })),
+        })
+        .expect(200);
     });
+
+    it('rejects overlapping availability slots', () =>
+      h
+        .http()
+        .put('/clinicians/me/availability')
+        .set(auth(doctor))
+        .send({
+          slots: [
+            { dayOfWeek: 1, startMinute: 540, endMinute: 600 },
+            { dayOfWeek: 1, startMinute: 560, endMinute: 620 },
+          ],
+        })
+        .expect(400));
 
     it('shows a public profile without any contact details (FR-CLIN-05)', async () => {
       const res = await h.http().get(`/clinicians/${clinicianId}`).set(auth(mother)).expect(200);
